@@ -1,0 +1,9 @@
+sys/
+toolchain/
+ref/
+libapp/
+build/
+to_del/
+src/**/makefile
+cov-result/
+tags

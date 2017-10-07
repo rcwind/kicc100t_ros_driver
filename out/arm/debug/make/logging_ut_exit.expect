@@ -1,0 +1,35 @@
+#!/usr/bin/expect 
+
+
+#set timeout 20          
+set timeout 20
+set ip $env(ARM_BOARD_IP)
+set exec_path $env(ARM_EXEC_PATH)
+set exec_name $env(ARM_EXEC_NAME)
+set user root           
+set prompt "\r*\ #\ $"
+
+log_user 0
+#This spawns the telnet program and connects it to the variable ip
+spawn telnet $ip      
+
+expect "login:"         
+send "$user\n"           
+
+expect "$prompt"
+send "cd $exec_path\r"
+
+#expect "/home/hl/bin #"
+expect "$prompt"
+log_user 1
+send "./$exec_name -u\r"
+
+expect "$prompt"
+log_user 0
+send "exit\r"
+
+#expect "*]\$\ $"
+log_user 1
+#interact             
+
+expect eof

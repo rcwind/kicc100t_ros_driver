@@ -1,0 +1,277 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
+
+# usuage:
+# entry <cmake> and run "make"
+
+#set(var 10)
+#message(${var})
+
+# include-----------------------------------------------------------------------
+include(../../cmake/CMakeLists_env.txt)
+
+#cpu config---------------------------------------------------------------------
+# GCFG_CPU_TYPE
+# 1    x86_32
+# 2    x86_64
+# 3    arm
+macro(init_x86_32)
+        add_definitions( -DGCFG_CPU_TYPE=1 )
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEBUG} -m32")
+endmacro()
+
+
+macro(init_x86_64)
+        add_definitions( -DGCFG_CPU_TYPE=2 )
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEBUG} ")
+endmacro()
+
+
+macro(init_arm)
+        # support cross compile
+        set(CMAKE_SYSTEM_NAME Linux)
+
+        # specify the cross compiler
+        # Please use absolute path instead of relative path
+        SET(CMAKE_C_COMPILER "${cross_compile_root}/bin/arm-none-linux-gnueabi-gcc")
+
+        # where is the target environment 
+        # this is a list of directories, each of the directories listed there 
+        # will be prepended to each of the search directories of every 
+        # FIND_XXX() command.
+        # find project source dir first, if we place same library in ./lib, 
+        # so we can override compiler's library.
+        set(CMAKE_FIND_ROOT_PATH ${PROJECT_SOURCE_DIR} ${cross_compile_root})
+
+        # search for programs in the build host directories
+        set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+        # for libraries and headers in the target directories
+        set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+        set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+        add_definitions( -DGCFG_CPU_TYPE=3 )
+endmacro()
+
+
+
+
+# project define start-----------------------------------------------------------------------
+project(kobuki_driver)
+find_package(catkin REQUIRED COMPONENTS ecl_mobile_robot ecl_converters ecl_devices ecl_geometry ecl_sigslots ecl_time ecl_command_line)
+
+catkin_package(
+        INCLUDE_DIRS include
+        LIBRARIES kobuki
+        CATKIN_DEPENDS ecl_mobile_robot ecl_converters ecl_devices ecl_geometry ecl_sigslots ecl_time ecl_command_line
+        )
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_subdirectory(src)
+
+
+include(${PROJECT_BINARY_DIR}/../make/CMakeLists_config.txt)
+if (cfg_cpu STREQUAL "arm")
+        init_arm()
+elseif (cfg_cpu STREQUAL "x86_32")
+        init_x86_32()
+elseif (cfg_cpu STREQUAL "x86_64")
+        init_x86_64()
+else ()
+        message("error cfg_cpu value")
+endif()
+
+
+
+# -g0   close gdb debug infomation
+# -Os   embeded system optimization
+# -E    Stop after the preprocessing stage
+#set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g0 -O0 -Wall -D_REENTRANT  -rdynamic")
+#set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Os -Wall -D_REENTRANT")
+
+
+macro(c_flag_debug)
+        # add_definitions( -DDEBUG )
+        # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_DEBUG} -g -O0 -Wall -D_REENTRANT  -rdynamic -fsanitize=thread -fPIE -pie")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG} -DDEBUG -lm -pthread -g -O0 -Wall -D_REENTRANT  -rdynamic -fPIE ")
+
+        # add -fsanitize=address or -fsanitize=thread
+        # It can NOT useable because sanitize only use in 64 bit.
+        if (cfg_cpu STREQUAL "arm")
+        elseif (cfg_cpu STREQUAL "x86_32")
+                set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -pie ")
+        elseif (cfg_cpu STREQUAL "x86_64")
+                set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread ")
+                #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address  ")
+                # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ")
+        else ()
+                message("error cfg_cpu value")
+        endif()
+endmacro()
+
+
+
+
+macro(c_flag_release)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE} -lm -pthread -Os -Wall -D_REENTRANT -rdynamic -fPIE  ")
+        # add strip in linking stage
+        set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -s " )
+endmacro()
+
+
+
+if (cfg_debug_on EQUAL 1)
+        c_flag_debug()
+elseif (cfg_debug_on EQUAL 0)
+        c_flag_release()
+else ()
+        message("error: NOT setting cfg_debug_on value")
+endif()
+
+
+# lib---------------------------------------------------------------------------
+
+
+macro(arm_lib_setting)
+        link_directories(${PROJECT_SOURCE_DIR}/lib/arm ${PROJECT_SOURCE_DIR}/libapp/arm)
+        #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/libapp/arm)
+endmacro()
+
+
+
+
+macro(x86_32_lib_setting)
+        link_directories(${PROJECT_SOURCE_DIR}/lib/x86_32 ${PROJECT_SOURCE_DIR}/libapp/x86_32)
+        #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/libapp/x86_32)
+endmacro()
+
+
+macro(x86_64_lib_setting)
+        link_directories(${PROJECT_SOURCE_DIR}/lib/x86_64 ${PROJECT_SOURCE_DIR}/libapp/x86_64)
+        #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/libapp/x86_64)
+endmacro()
+
+
+if (cfg_cpu STREQUAL "arm")
+        arm_lib_setting()
+elseif (cfg_cpu STREQUAL "x86_32")
+        x86_32_lib_setting()
+elseif (cfg_cpu STREQUAL "x86_64")
+        x86_64_lib_setting()
+else ()
+        message("error cfg_cpu value")
+endif()
+
+
+# setting-----------------------------------------------------------------------
+#file(GLOB APP_SRC "./src/main/*.c")
+#add_executable(ftu ${APP_SRC})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/libapp)
+
+#set(CMAKE_SHARED_LINKER_FLAGS "-fsanitize=thread -pie")
+#set(CMAKE_STATIC_LIBRARY_FLAGS "-fsanitize=thread -pie")
+#set(GCC_COVERAGE_COMPILE_FLAGS "-fsanitize=thread -pie")
+#set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+#add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+
+
+
+# add include directory
+#file(GLOB_RECURSE Foo_HEADERS "inc/*.h")
+#set (Foo_INCLUDE_DIRS "")
+#foreach (_headerFile ${Foo_HEADERS})
+#        get_filename_component(_dir ${_headerFile} PATH)
+#        list (APPEND Foo_INCLUDE_DIRS ${_dir})
+#endforeach()
+#list(REMOVE_DUPLICATES Foo_INCLUDE_DIRS)
+#include_directories(${Foo_INCLUDE_DIRS})
+
+
+#MACRO(subdirlist result curdir)
+#        FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+#        SET(dirlist "")
+#        FOREACH(child ${children})
+#                IF(IS_DIRECTORY ${curdir}/${child})
+#                        SET(dirlist ${dirlist} ${child})
+#                ENDIF()
+#        ENDFOREACH()
+#        SET(${result} ${dirlist})
+#ENDMACRO()
+#subdirlist(subdirs "${PROJECT_SOURCE_DIR}/./inc/")
+#include_directories(${subdirs})
+
+
+# add ftu/arm/src/inc/ to include directories
+#set (BOINC_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/inc")
+#FILE(GLOB SRC_INC_ALL_FILES ${BOINC_INCLUDE_DIR} ${BOINC_INCLUDE_DIR}/*)
+#FOREACH(_FILE ${SRC_INC_ALL_FILES})
+#        IF(IS_DIRECTORY ${_FILE})
+#                message(${_FILE})
+#                INCLUDE_DIRECTORIES(${_FILE})
+#        ENDIF()
+#ENDFOREACH()
+
+
+# add ftu/arm/drv/ to include directories
+#FILE(GLOB DRV_ALL_FILES ${drv_root} ${drv_root}/*)
+#FOREACH(_FILE ${DRV_ALL_FILES})
+#        IF(IS_DIRECTORY ${_FILE})
+#                message(${_FILE})
+#                INCLUDE_DIRECTORIES(${_FILE})
+#        ENDIF()
+#ENDFOREACH()
+
+
+# NOTE: add new subdir below, 
+#       and switch to <./main/CMakeLists.txt> add target_link_libraries()
+#file(GLOB_RECURSE src_CMakeLists "src/CMakeLists.txt")
+#file(GLOB_RECURSE utest_CMakeLists "utest/CMakeLists.txt")
+#set(list_CMakeLists ${src_CMakeLists} ${utest_CMakeLists})
+#set (Foo_DIRS "")
+#foreach (_file ${list_CMakeLists})
+#        get_filename_component(_dir ${_file} PATH)
+#        list (APPEND Foo_DIRS ${_dir})
+#endforeach()
+#list(REMOVE_DUPLICATES Foo_DIRS)
+
+#foreach (_file ${Foo_DIRS})
+#        #message("${_file}")
+#        add_subdirectory("${_file}")
+#endforeach()
+
+
+
+# note: if find ld not find some function, adjust link sequence of the library
+#target_link_libraries( 
+#        
+#)
+
+message("cmake linker ${CMAKE_EXE_LINKER_FLAGS}")
+#set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -export-dynamic ")
+
+# install
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/bin)
+#file(GLOB for_test_files 
+#        "./src/ini/for_test/*" 
+#        "./src/dp/for_test/*" 
+#        "./src/cfg/for_test/*" 
+#        )
+#file(GLOB for_run_files 
+#        "./src/ini/for_run/*" 
+#        "./src/dfile/for_run/*" 
+#        "./src/batterydrv/for_run/*" 
+#        )
+#file(GLOB log_files "src/qlog/log/*")
+
+#INSTALL(FILES ${for_test_files}
+#        DESTINATION "./for_test"
+#        )
+#INSTALL(FILES ${for_run_files}
+#        DESTINATION "./for_run"
+#        )
+#INSTALL(FILES ${log_files}
+#        DESTINATION "./log"
+#        )
+#INSTALL(DIRECTORY "./install/"
+#        DESTINATION "."
+#        USE_SOURCE_PERMISSIONS
+#        )
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# directory of shell script, not equal `pwd`
+#CDIR=$(pwd)/${0}
+
+source ../../../../bin/set_env.sh
+#export ARM_BOARD_IP=10.0.1.101
+export ARM_EXEC_PATH=/home/$ARM_USER/release
+#export ARM_EXEC_NAME=ftu
+

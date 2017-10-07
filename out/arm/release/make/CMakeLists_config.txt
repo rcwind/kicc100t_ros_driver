@@ -1,0 +1,10 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
+
+# This file config CMake
+set(cfg_cpu arm)        # arm, x86
+set(cfg_debug_on 0)     # 1, 0
+
+# If you want to get makefile detail output, uncomment below
+# Or "make VERBOSE=1"
+#set(CMAKE_VERBOSE_MAKEFILE on)
+
