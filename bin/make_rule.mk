@@ -16,7 +16,7 @@ all:
 	#@cd $(build_root) && make
 	
 cp:
-	sudo cp -f $(build_root)/devel/lib/libkobuki.so /opt/ros/indigo/lib/libkobuki.so
+	sudo cp -f $(build_root)/devel/lib/libkobuki.so /opt/ros/kinetic/lib/libkobuki.so
 # below code cause cmake always invoked for $(build_root) is a variable instead 
 # of a real path.
 # $(build_root): cmake
