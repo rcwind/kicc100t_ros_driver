@@ -200,6 +200,7 @@ private:
   ** Packet Handling
   **********************/
   CoreSensors core_sensors;
+  Ultrasonic ultrasonic;
   Inertia inertia;
   DockIR dock_ir;
   Cliff cliff;
