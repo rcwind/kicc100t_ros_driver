@@ -38,7 +38,7 @@ $(build_root): $(make_root)/CMakeLists_config.txt $(src_root)/kobuki_driver/CMak
 cmake_do: $(build_root) install_makefile
 	cd $(build_root) && cmake $(src_root)/kobuki_driver
 	cd $(build_root) && make 
-cmake: cmake_do install cp
+cmake: cmake_do install 
 
 $(src_root)/kobuki_driver/CMakeLists.txt:
 	ifneq ($(bin_root)/../cmake/CMakeLists.txt.templet, $(src_root)/kobuki_driver/CMakeLists.txt)
