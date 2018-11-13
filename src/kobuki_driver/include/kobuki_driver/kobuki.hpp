@@ -135,6 +135,7 @@ public:
   Inertia::Data getInertiaData() const { return inertia.data; }
   GpInput::Data getGpInputData() const { return gp_input.data; }
   ThreeAxisGyro::Data getRawInertiaData() const { return three_axis_gyro.data; }
+  Ultrasonic::Data getUltrasonicData() const { return ultrasonic.data; }
   ControllerInfo::Data getControllerInfoData() const { return controller_info.data; }
 
   /*********************
@@ -210,6 +211,7 @@ private:
   Firmware firmware; // requestable
   UniqueDeviceID unique_device_id; // requestable
   ThreeAxisGyro three_axis_gyro;
+  Ultrasonic ultrasonic;
   ControllerInfo controller_info; // requestable
 
   ecl::Serial serial;
