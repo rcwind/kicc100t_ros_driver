@@ -8,7 +8,7 @@
 ** Defines
 *****************************************************************************/
 
-#define MAX_DATA_SIZE (2*32) //derived from ST_GYRO_MAX_DATA_SIZE in firmware
+#define MAX_ULT_DATA_SIZE (2*32) //derived from ST_GYRO_MAX_DATA_SIZE in firmware
 
 /*****************************************************************************
 ** Namespaces
@@ -27,7 +27,7 @@ public:
   Ultrasonic() : packet_handler::payloadBase(true, 3) {};
   struct Data {
     unsigned char followed_data_length;
-    unsigned short data[MAX_DATA_SIZE];
+    unsigned short data[MAX_ULT_DATA_SIZE];
   } data;
 
   virtual ~Ultrasonic() {};

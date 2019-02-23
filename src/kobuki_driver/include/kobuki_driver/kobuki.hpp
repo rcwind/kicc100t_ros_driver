@@ -211,7 +211,6 @@ private:
   Firmware firmware; // requestable
   UniqueDeviceID unique_device_id; // requestable
   ThreeAxisGyro three_axis_gyro;
-  Ultrasonic ultrasonic;
   ControllerInfo controller_info; // requestable
 
   ecl::Serial serial;
