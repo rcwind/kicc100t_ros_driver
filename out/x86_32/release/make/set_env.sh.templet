@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# directory of shell script, not equal `pwd`
-#CDIR=$(pwd)/${0}
-
-#export ARM_BOARD_IP=10.0.1.119
-#export ARM_EXEC_PATH=/home/hl/debug
-#export ARM_EXEC_NAME=ftu
-
