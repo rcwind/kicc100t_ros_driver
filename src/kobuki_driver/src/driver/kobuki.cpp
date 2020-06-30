@@ -259,6 +259,10 @@ void Kobuki::spin()
         switch (data_buffer[0])
         {
           // these come with the streamed feedback
+          case Header::Ultrasonic:
+            if( !ultrasonic.deserialise(data_buffer) ) { fixPayload(data_buffer); break; }
+            // event_manager.update(ultrasonic.data, cliff.data.bottom);
+            break;
           case Header::CoreSensors:
             if( !core_sensors.deserialise(data_buffer) ) { fixPayload(data_buffer); break; }
             event_manager.update(core_sensors.data, cliff.data.bottom);

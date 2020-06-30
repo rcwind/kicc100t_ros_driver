@@ -135,6 +135,7 @@ public:
   Inertia::Data getInertiaData() const { return inertia.data; }
   GpInput::Data getGpInputData() const { return gp_input.data; }
   ThreeAxisGyro::Data getRawInertiaData() const { return three_axis_gyro.data; }
+  Ultrasonic::Data getUltrasonicData() const { return ultrasonic.data; }
   ControllerInfo::Data getControllerInfoData() const { return controller_info.data; }
 
   /*********************
@@ -200,6 +201,7 @@ private:
   ** Packet Handling
   **********************/
   CoreSensors core_sensors;
+  Ultrasonic ultrasonic;
   Inertia inertia;
   DockIR dock_ir;
   Cliff cliff;
