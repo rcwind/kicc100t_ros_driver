@@ -51,11 +51,11 @@ bool PacketFinder::checkSum()
 Kobuki::Kobuki() :
     shutdown_requested(false)
     , is_enabled(false)
+    , heading_offset(0.0/0.0)
     , is_connected(false)
     , is_alive(false)
     , version_info_reminder(0)
     , controller_info_reminder(0)
-    , heading_offset(0.0/0.0)
     , velocity_commands_debug(4, 0)
 {
 }
@@ -179,10 +179,6 @@ void Kobuki::spin()
   ecl::TimeStamp last_signal_time;
   ecl::Duration timeout(0.1);
   unsigned char buf[256];
-
-  /*********************
-   ** Simulation Params
-   **********************/
 
   while (!shutdown_requested)
   {
@@ -536,7 +532,7 @@ void Kobuki::sendBaseControlCommand()
   }
   diff_drive.velocityCommands(velocity_commands_received);
   std::vector<short> velocity_commands = diff_drive.velocityCommands();
-  //std::cout << "speed: " << velocity_commands[0] << ", radius: " << velocity_commands[1] << std::endl;
+  // std::cout << "speed: " << velocity_commands[0] << ", radius: " << velocity_commands[1] << std::endl;
   sendCommand(Command::SetVelocityControl(velocity_commands[0], velocity_commands[1]));
 
   //experimental; send raw control command and received command velocity
