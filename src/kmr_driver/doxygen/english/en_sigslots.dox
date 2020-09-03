@@ -1,0 +1,163 @@
+/**
+
+@page enSigslotsGuide Sigslots
+
+@section sigslotsIntro Introduction
+
+Sigslots are the primary way to handle events emitted by the kmr driver (c.f. with the usual
+function callbacks with void function pointers as arguments). Rather than repeating here a
+verbose explanation of what they are and how they work, the best option is to go straight to the
+official documentation - <a href="http://ros.org/wiki/ecl_sigslots">ecl_sigslots</a>.
+
+@section sigslotReference Sigslot Reference
+
+The kmr driver establishes a set of signals on uniquely established namespaces. The
+namespace for each is separated into two parts - the first is the namespace specified by
+the sigslots_namespace variable in the kmr::Parameter strucutre. The second
+uniquely identifies the signal itself.
+
+The following represent the available signals when namespaced under "/kmr" (default).
+
+- void : /kmr/stream_data : informs when a new data packet has arrived from the kmr
+- std::string : /kmr/ros_debug : relay debug messages
+- std::string : /kmr/ros_info : relay info messages
+- std::string : /kmr/ros_warn : relay warning messages
+- std::string : /kmr/ros_error : relay error messages
+- kmr::ButtonEvent : /kmr/button_event : receive an event when a button state changes
+- kmr::BumperEvent : /kmr/bumper_event : receive an event when the bumper state changes
+- kmr::CliffEvent : /kmr/cliff_event : receive an event when a cliff sensor state changes
+- kmr::WheelEvent: /kmr/wheel_event : receive an event when the wheel state (in/out) changes
+- kmr::PowerEvent : /kmr/power_event : receive an event when the power/charging state changes
+- kmr::InputEvent : /kmr/input_event : receive an event when the gpio state changes
+- kmr::RobotEvent : /kmr/robot_event : receive an event when the robot state changes
+- kmr::VersionInfo : /kmr/version_info : receive version info strings on this signal
+
+It does not establish any slots.
+
+@section exampleSigSlots Usage
+
+The <i>/kmr/stream_data</i> is the most important slot. The kmr sends a single long data packet
+periodically and when this is received, it emits a signal informing you that it has arrived and is
+ready to be processed. At this point, you can quiz the kmr driver for the state (
+@ref kmr::Kobuki::getCoreSensorData) which returns a @ref kmr::CoreSensors::Data structure
+holding all the important sensor information for kmr.
+
+@subsection simpleExample Simple Example - Catching Wheel Odometry
+
+A small example program which processes this signal sending current wheel encoder values
+to standard output:
+
+@code
+#include <ecl/time.hpp>
+#include <ecl/sigslots.hpp>
+#include <iostream>
+#include <kmr_driver/kmr.hpp>
+
+class KobukiManager {
+public:
+  KobukiManager() :
+      slot_stream_data(&KobukiManager::processStreamData, *this) // establish the callback
+  {
+    kmr::Parameters parameters;
+    parameters.sigslots_namespace = "/kmr"; // configure the first part of the sigslot namespace
+    parameters.device_port = "/dev/kmr";         // the serial port to connect to (windows COM1..)
+    kmr.init(parameters);
+    slot_stream_data.connect("/kmr/stream_data");
+  }
+
+  void spin() {
+    ecl::Sleep sleep(1);
+    while ( true ) {
+      sleep();
+    }
+  }
+
+  /*
+   * Called whenever the kmr receives a data packet. Up to you from here to process it.
+   *
+   * Note that special processing is done for the various events which discretely change
+   * state (bumpers, cliffs etc) and updates for these are informed via the xxxEvent
+   * signals provided by the kmr driver.
+   */
+  void processStreamData() {
+    kmr::CoreSensors::Data data = kmr.getCoreSensorData();
+    std::cout << "Encoders [" <<  data.left_encoder << "," << data.right_encoder << "]" << std::endl;
+  }
+
+private:
+  kmr::Kobuki kmr;
+  ecl::Slot<> slot_stream_data;
+};
+
+int main() {
+  KobukiManager kmr_manager;
+  kmr_manager.spin();
+  return 0;
+}
+@endcode
+
+@subsection otherSignals Other Signals
+
+The other signals will pass a structure of a particular type with the transmitted information.
+Process the same way, using the event type as the argument to the callback function.
+
+@section detailedSigslotsExample Detailed Example
+
+More detailed example code can be found in the ros kmr node implementation. See the
+<a href="http://ros.org/wiki/kmr_node">kmr_node</a> implementation for a ros platform.
+
+@section Troubleshooting
+
+While debugging, you may often accidentally leave sigslots dangling, typos for the connection
+name are a common cause. For this, there is an introspection method available which you can
+use to quickly print the currently sigslot connections (dangling or otherwise).
+
+A code snippet:
+
+@code
+  Kobuki kmr
+  Parameters parameters;
+  // configure parameters here
+  kmr.init(parameters);
+  // make some sigslot connections here
+  kmr.printSigSlotConnections();
+@endcode
+
+Depending on your sigslot connection configuration, you should see something like the following,
+
+@code
+========== Void ==========
+Topics
+  Name: /kmr/stream_data
+    # Subscribers: 1
+    # Publishers : 1
+========= String =========
+Topics
+  Name: /kmr/ros_debug
+    # Subscribers: 1
+    # Publishers : 1
+  Name: /kmr/ros_error
+    # Subscribers: 1
+    # Publishers : 2
+  Name: /kmr/ros_info
+    # Subscribers: 1
+    # Publishers : 1
+  Name: /kmr/ros_warn
+    # Subscribers: 1
+    # Publishers : 2
+====== Button Event ======
+Topics
+  Name: /kmr/button_event
+    # Subscribers: 1
+    # Publishers : 1
+====== Bumper Event ======
+Topics
+  Name: /kmr/bumper_event
+    # Subscribers: 1
+    # Publishers : 1
+...
+@endcode
+
+This uses the sigslots manager to retrieve the information. A full example of its use can be found in the ecl_sigslot sources: <a href="http://ros.org/doc/hydro/api/ecl_sigslots/html/sigslots__manager_8cpp_source.html">example cpp program</a>.
+
+**/

@@ -1,0 +1,11 @@
+#include "kmr_driver/version_info.hpp"
+
+namespace kmr
+{
+
+std::string VersionInfo::getSoftwareVersion()
+{
+  return std::string("@kmr_driver_VERSION@");
+}
+
+} //namespace kmr
