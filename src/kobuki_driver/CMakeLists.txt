@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.3)
-project(kobuki_driver)
+project(kmr_driver)
 
 ##############################################################################
 # Catkin
@@ -28,7 +28,7 @@ find_package(catkin
 
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES kobuki
+    LIBRARIES kmr
     CATKIN_DEPENDS
         ecl_command_line
         ecl_converters
