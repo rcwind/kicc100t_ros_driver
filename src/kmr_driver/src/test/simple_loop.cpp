@@ -21,11 +21,11 @@
 ** Classes
 *****************************************************************************/
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() :
+  KmrManager() :
     dx(0.0), dth(0.0),
-    slot_stream_data(&KobukiManager::processStreamData, *this)
+    slot_stream_data(&KmrManager::processStreamData, *this)
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/kmr";
@@ -36,7 +36,7 @@ public:
     slot_stream_data.connect("/kmr/stream_data");
   }
 
-  ~KobukiManager() {
+  ~KmrManager() {
     kmr.setBaseControl(0,0); // linear_velocity, angular_velocity in (m/s), (rad/s)
     kmr.disable();
   }
@@ -68,7 +68,7 @@ public:
 private:
   double dx, dth;
   ecl::LegacyPose2D<double> pose;
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 };
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
   signal(SIGINT, signalHandler);
 
   std::cout << "Demo : Example of simple control loop." << std::endl;
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
 
   ecl::Sleep sleep(1);
   ecl::LegacyPose2D<double> pose;

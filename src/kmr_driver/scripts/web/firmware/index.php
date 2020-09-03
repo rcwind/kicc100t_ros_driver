@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Kobuki Firmware</title>
+    <title>Kmr Firmware</title>
   </head>
   <body>
   <?php
@@ -11,8 +11,8 @@
     $binaries = glob($directory . "*.hex");
  
     //print each file name
-    echo("<h1>Firmware for Kobuki</h1>");
-    echo("<p>The following files are firmware binaries for the Kobuki. Refer to the web-site ");
+    echo("<h1>Firmware for Kmr</h1>");
+    echo("<p>The following files are firmware binaries for the Kmr. Refer to the web-site ");
     echo("<a href='http://kmr.yujinrobot.com/documentation/howtos/upgrading-firmware/'>howto</a> ");
     echo("for installation instructions.");
     echo("<ul>\n");
@@ -34,7 +34,7 @@
     echo("</ul>\n");
     echo("<p>About the firmware versions:</p>");
     echo("<ul>\n");
-    echo("<li>'factory': this is flashed onto the Kobukis in the factory. It has undergone serious testing, but is usually not the most recent one.</li>\n");
+    echo("<li>'factory': this is flashed onto the Kmrs in the factory. It has undergone serious testing, but is usually not the most recent one.</li>\n");
     echo("<li>'latest-stable': more recent, but less tested
 </li>\n");
     echo("<li>'latest': most recent, but be aware that this version hasn't been tested much and might not be very stable.</li>\n");

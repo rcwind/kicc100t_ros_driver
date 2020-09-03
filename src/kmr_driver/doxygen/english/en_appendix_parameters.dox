@@ -1,12 +1,12 @@
 /**
 
-@page enAppendixKobukiParameters Appendix : Kobuki Parameters
+@page enAppendixKmrParameters Appendix : Kmr Parameters
 
 @tableofcontents
 
 
 <!-----------------------------
-         Kobuki Parameters
+         Kmr Parameters
 ------------------------------->
 
 @section enOverview Overview
@@ -18,10 +18,10 @@ Here are necessary parameters of kmr for conversion of encoder ticks to robot po
 
 
 <!-----------------------------
-         Kobuki Parameters
+         Kmr Parameters
 ------------------------------->
 
-@section enKobukiParameters Kobuki Parameters
+@section enKmrParameters Kmr Parameters
 
 <table>
 <tr><th></th><th>Name</th><th>Value</th><th>Description</th></tr>

@@ -57,14 +57,14 @@
  * @brief Keyboard remote control for our robot core (mobile base).
  *
  */
-class KobukiManager
+class KmrManager
 {
 public:
   /*********************
    ** C&D
    **********************/
-  KobukiManager();
-  ~KobukiManager();
+  KmrManager();
+  ~KmrManager();
   bool init();
 
   /*********************
@@ -85,7 +85,7 @@ public:
 private:
   double vx, wz;
   ecl::LegacyPose2D<double> pose;
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 
   double linear_vel_step, linear_vel_max;
@@ -121,7 +121,7 @@ private:
 /**
  * @brief Default constructor, needs initialisation.
  */
-KobukiManager::KobukiManager() :
+KmrManager::KmrManager() :
                          linear_vel_step(0.05),
                          linear_vel_max(1.0),
                          angular_vel_step(0.33),
@@ -129,12 +129,12 @@ KobukiManager::KobukiManager() :
                          quit_requested(false),
                          key_file_descriptor(0),
                          vx(0.0), wz(0.0),
-                         slot_stream_data(&KobukiManager::processStreamData, *this)
+                         slot_stream_data(&KmrManager::processStreamData, *this)
 {
   tcgetattr(key_file_descriptor, &original_terminal_state); // get terminal properties
 }
 
-KobukiManager::~KobukiManager()
+KmrManager::~KmrManager()
 {
   kmr.setBaseControl(0,0); // linear_velocity, angular_velocity in (m/s), (rad/s)
   kmr.disable();
@@ -144,15 +144,15 @@ KobukiManager::~KobukiManager()
 /**
  * @brief Initialises the node.
  */
-bool KobukiManager::init()
+bool KmrManager::init()
 {
   /*********************
    ** Parameters
    **********************/
-  std::cout << "KobukiManager : using linear  vel step [" << linear_vel_step << "]." << std::endl;
-  std::cout << "KobukiManager : using linear  vel max  [" << linear_vel_max << "]." << std::endl;
-  std::cout << "KobukiManager : using angular vel step [" << angular_vel_step << "]." << std::endl;
-  std::cout << "KobukiManager : using angular vel max  [" << angular_vel_max << "]." << std::endl;
+  std::cout << "KmrManager : using linear  vel step [" << linear_vel_step << "]." << std::endl;
+  std::cout << "KmrManager : using linear  vel max  [" << linear_vel_max << "]." << std::endl;
+  std::cout << "KmrManager : using angular vel step [" << angular_vel_step << "]." << std::endl;
+  std::cout << "KmrManager : using angular vel max  [" << angular_vel_max << "]." << std::endl;
 
   /*********************
    ** Velocities
@@ -161,7 +161,7 @@ bool KobukiManager::init()
   wz = 0.0;
 
   /*********************
-   ** Kobuki
+   ** Kmr
    **********************/
   kmr::Parameters parameters;
   parameters.sigslots_namespace = "/kmr";
@@ -175,7 +175,7 @@ bool KobukiManager::init()
   /*********************
    ** Wait for connection
    **********************/
-  thread.start(&KobukiManager::keyboardInputLoop, *this);
+  thread.start(&KmrManager::keyboardInputLoop, *this);
   return true;
 }
 
@@ -188,7 +188,7 @@ bool KobukiManager::init()
  *
  * It also process ros functions as well as aborting when requested.
  */
-void KobukiManager::spin()
+void KmrManager::spin()
 {
 /*
   {
@@ -214,7 +214,7 @@ void KobukiManager::spin()
  * This is ok here - but later it might be a good idea to make a node which
  * posts keyboard events to a topic. Recycle common code if used by many!
  */
-void KobukiManager::keyboardInputLoop()
+void KmrManager::keyboardInputLoop()
 {
   struct termios raw;
   memcpy(&raw, &original_terminal_state, sizeof(struct termios));
@@ -248,7 +248,7 @@ void KobukiManager::keyboardInputLoop()
  *
  * @param c keyboard input.
  */
-void KobukiManager::processKeyboardInput(char c)
+void KmrManager::processKeyboardInput(char c)
 {
   /*
    * Arrow keys are a bit special, they are escape characters - meaning they
@@ -303,7 +303,7 @@ void KobukiManager::processKeyboardInput(char c)
 /**
  * @brief If not already maxxed, increment the command velocities..
  */
-void KobukiManager::incrementLinearVelocity()
+void KmrManager::incrementLinearVelocity()
 {
   if (vx <= linear_vel_max)
   {
@@ -315,7 +315,7 @@ void KobukiManager::incrementLinearVelocity()
 /**
  * @brief If not already minned, decrement the linear velocities..
  */
-void KobukiManager::decrementLinearVelocity()
+void KmrManager::decrementLinearVelocity()
 {
   if (vx >= -linear_vel_max)
   {
@@ -327,7 +327,7 @@ void KobukiManager::decrementLinearVelocity()
 /**
  * @brief If not already maxxed, increment the angular velocities..
  */
-void KobukiManager::incrementAngularVelocity()
+void KmrManager::incrementAngularVelocity()
 {
   if (wz <= angular_vel_max)
   {
@@ -339,7 +339,7 @@ void KobukiManager::incrementAngularVelocity()
 /**
  * @brief If not already mined, decrement the angular velocities..
  */
-void KobukiManager::decrementAngularVelocity()
+void KmrManager::decrementAngularVelocity()
 {
   if (wz >= -angular_vel_max)
   {
@@ -348,14 +348,14 @@ void KobukiManager::decrementAngularVelocity()
 //    ROS_INFO_STREAM("KeyOp: angular velocity decremented [" << cmd->linear.x << "|" << cmd->angular.z << "]");
 }
 
-void KobukiManager::resetVelocity()
+void KmrManager::resetVelocity()
 {
   vx = 0.0;
   wz = 0.0;
 //    ROS_INFO_STREAM("KeyOp: reset linear/angular velocities.");
 }
 
-void KobukiManager::processStreamData() {
+void KmrManager::processStreamData() {
   ecl::LegacyPose2D<double> pose_update;
   ecl::linear_algebra::Vector3d pose_update_rates;
   kmr.updateOdometry(pose_update, pose_update_rates);
@@ -369,7 +369,7 @@ void KobukiManager::processStreamData() {
   kmr.setBaseControl(vx, wz);
 }
 
-ecl::LegacyPose2D<double> KobukiManager::getPose() {
+ecl::LegacyPose2D<double> KmrManager::getPose() {
   return pose;
 }
 
@@ -391,7 +391,7 @@ int main(int argc, char** argv)
   signal(SIGINT, signalHandler);
 
   std::cout << "Simple Keyop : Utility for driving kmr by keyboard." << std::endl;
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
   kmr_manager.init();
 
   ecl::Sleep sleep(1);

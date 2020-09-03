@@ -11,9 +11,9 @@
 #include <kmr_driver/kmr.hpp>
 #include <ecl/time.hpp>
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() {
+  KmrManager() {
     kmr::Parameters parameters;
     // change the default device port from /dev/kmr to /dev/ttyUSB0
     parameters.device_port = "/dev/ttyUSB0";
@@ -37,11 +37,11 @@ public:
     }
   }
 private:
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
 };
 
 int main() {
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
   ecl::Sleep()(5);
   return 0;
 }

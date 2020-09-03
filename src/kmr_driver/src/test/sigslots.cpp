@@ -16,10 +16,10 @@
 ** Classes
 *****************************************************************************/
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() :
-      slot_stream_data(&KobukiManager::processStreamData, *this) // establish the callback
+  KmrManager() :
+      slot_stream_data(&KmrManager::processStreamData, *this) // establish the callback
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/mobile_base"; // configure the first part of the sigslot namespace
@@ -49,7 +49,7 @@ public:
   }
 
 private:
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 };
 
@@ -58,7 +58,7 @@ private:
 *****************************************************************************/
 
 int main() {
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
   kmr_manager.spin();
   return 0;
 }

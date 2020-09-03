@@ -19,11 +19,11 @@
 ** Classes
 *****************************************************************************/
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager(const std::string &device_port) :
+  KmrManager(const std::string &device_port) :
     acquired(false),
-    slot_version_info(&KobukiManager::processVersionInfo, *this)
+    slot_version_info(&KmrManager::processVersionInfo, *this)
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/kmr"; // configure the first part of the sigslot namespace
@@ -33,7 +33,7 @@ public:
     slot_version_info.connect("/kmr/version_info");
   }
 
-  ~KobukiManager() {
+  ~KmrManager() {
     kmr.disable();
   }
 
@@ -54,7 +54,7 @@ public:
 
 private:
   volatile bool acquired;
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   std::string hardware, firmware, software, udid;
   ecl::Slot<const kmr::VersionInfo&> slot_version_info;
 };
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   //std::cout << "device_port: " << device_port.getValue() << std::endl;
 
   std::cout << "Version Info:" << std::endl;
-  KobukiManager kmr_manager(device_port.getValue());
+  KmrManager kmr_manager(device_port.getValue());
 
   while (!kmr_manager.isAcquired());
   std::cout << " * Hardware Version: " << kmr_manager.getHardwareVersion() << std::endl;

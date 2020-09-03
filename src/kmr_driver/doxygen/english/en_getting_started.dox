@@ -3,15 +3,15 @@
 
 @section kmrClass Overview
 
-The @ref kmr::Kobuki class is the first port of call for developing your kmr program. 
+The @ref kmr::Kmr class is the first port of call for developing your kmr program. 
 All kmr configuration and interaction is done via this class. This guide will cover 
 configuration and interaction with the library method api. Interactions via callbacks 
 using sigslots is covered especially in the guide on @ref enSigslotsGuide "sigslots".  
 
 @section kmrConfiguration Configuration
 
-Kobuki configuration is handled by the @ref kmr::Parameters "kmr::Parameters" class which
-is passed to the kmr instance via the @ref kmr::Kobuki::init "kmr::Kobuki::init()" method. Most of the
+Kmr configuration is handled by the @ref kmr::Parameters "kmr::Parameters" class which
+is passed to the kmr instance via the @ref kmr::Kmr::init "kmr::Kmr::init()" method. Most of the
 parameters to be configured have sane defaults. The only one that requires frequent configuration is 
 typically the serial @ref kmr::Parameters::device_port "device_port". Note that on some systems you 
 can configure a rule (refer to the @ref enFtdiGuide "ftdi serial device guide") for the device port, 
@@ -22,9 +22,9 @@ otherwise you will require one of the usual COM1 or /dev/ttyUSB0 values.
 #include <kmr_driver/kmr.hpp>
 #include <ecl/time.hpp>
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() {
+  KmrManager() {
     kmr::Parameters parameters;
     // change the default device port from /dev/kmr to /dev/ttyUSB0
     parameters.device_port = "/dev/ttyUSB0";
@@ -48,11 +48,11 @@ public:
     }
   }
 private:
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
 };
 
 int main() {
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
   ecl::Sleep()(5);
   return 0;
 }
@@ -70,14 +70,14 @@ the raw data, and additionally doing some processing before updating the current
 
 Raw data can be accessed at any time by one of the following getXXX commands:
 
-- kmr::Kobuki::getCoreSensorData
-- kmr::Kobuki::getDockIRData
-- kmr::Kobuki::getCliffData
-- kmr::Kobuki::getCurrentData
-- kmr::Kobuki::getGpInputData
-- kmr::Kobuki::getInertiaData
-- kmr::Kobuki::getRawInertiaData
-- kmr::Kobuki::getControllerInfoData
+- kmr::Kmr::getCoreSensorData
+- kmr::Kmr::getDockIRData
+- kmr::Kmr::getCliffData
+- kmr::Kmr::getCurrentData
+- kmr::Kmr::getGpInputData
+- kmr::Kmr::getInertiaData
+- kmr::Kmr::getRawInertiaData
+- kmr::Kmr::getControllerInfoData
 
 The gyro provides both filtered yaw angle as well as unfiltered 3-axis inertial data hence the
 two calls above.
@@ -86,33 +86,33 @@ two calls above.
 
 The following are convenience methods for accessing the current state of the robot 
 
-- kmr::Kobuki::batteryStatus
-- kmr::Kobuki::getHeading
-- kmr::Kobuki::getAngularVelocity
-- kmr::Kobuki::versionInfo : hardware, firmware and software version strings.
-- kmr::Kobuki::getWheelJointStates
-- kmr::Kobuki::isAlive : true if a kmr is detected and streaming data.
-- kmr::Kobuki::isEnabled : true if the motor power is enabled
-- kmr::Kobuki::isShutdown : true if the worker threads for this driver have been shut down.
+- kmr::Kmr::batteryStatus
+- kmr::Kmr::getHeading
+- kmr::Kmr::getAngularVelocity
+- kmr::Kmr::versionInfo : hardware, firmware and software version strings.
+- kmr::Kmr::getWheelJointStates
+- kmr::Kmr::isAlive : true if a kmr is detected and streaming data.
+- kmr::Kmr::isEnabled : true if the motor power is enabled
+- kmr::Kmr::isShutdown : true if the worker threads for this driver have been shut down.
 
 
 @subsection kmrSoftCommands Soft Commands
 
-- kmr::Kobuki::resetOdometry
+- kmr::Kmr::resetOdometry
 
 @subsection kmrHardCommands Hard Commands
 
-- kmr::Kobuki::setBaseControl
-- kmr::Kobuki::setLed
-- kmr::Kobuki::setDigitalOutput
-- kmr::Kobuki::setExternalPower
-- kmr::Kobuki::playSoundSequence
-- kmr::Kobuki::setControllerGain
-- kmr::Kobuki::getControllerGain
+- kmr::Kmr::setBaseControl
+- kmr::Kmr::setLed
+- kmr::Kmr::setDigitalOutput
+- kmr::Kmr::setExternalPower
+- kmr::Kmr::playSoundSequence
+- kmr::Kmr::setControllerGain
+- kmr::Kmr::getControllerGain
 
 @subsection differentialDriverModule The Differential Drive Module
 
-The final function of importance is the @ref kmr::Kobuki::updateOdometry method. This updates the current odometry state
+The final function of importance is the @ref kmr::Kmr::updateOdometry method. This updates the current odometry state
 of the robot, fusing encoder and gyro heading data with the previous known state. For deterministic odometry, it is important
 this method is called each time a new data packet from the kmr arrives. Refer to the 
 @ref enSimpleExample "simple control loop example" for more information and working code to illustrate.

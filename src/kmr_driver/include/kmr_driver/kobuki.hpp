@@ -77,18 +77,18 @@ public:
 };
 
 /*****************************************************************************
- ** Interface [Kobuki]
+ ** Interface [Kmr]
  *****************************************************************************/
 /**
  * @brief  The core kmr driver class.
  *
  * This connects to the outside world via sigslots and get accessors.
  **/
-class kmr_PUBLIC Kobuki
+class kmr_PUBLIC Kmr
 {
 public:
-  Kobuki();
-  ~Kobuki();
+  Kmr();
+  ~Kmr();
 
   /*********************
    ** Configuration

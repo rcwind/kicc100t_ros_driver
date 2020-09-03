@@ -48,7 +48,7 @@ bool PacketFinder::checkSum()
  ** Implementation [Initialisation]
  *****************************************************************************/
 
-Kobuki::Kobuki() :
+Kmr::Kmr() :
     shutdown_requested(false)
     , is_enabled(false)
     , heading_offset(0.0/0.0)
@@ -63,7 +63,7 @@ Kobuki::Kobuki() :
 /**
  * Shutdown the driver - make sure we wait for the thread to finish.
  */
-Kobuki::~Kobuki()
+Kmr::~Kmr()
 {
   disable();
   shutdown_requested = true; // thread's spin() will catch this and terminate
@@ -71,12 +71,12 @@ Kobuki::~Kobuki()
   sig_debug.emit("Device: kmr driver terminated.");
 }
 
-void Kobuki::init(Parameters &parameters) throw (ecl::StandardException)
+void Kmr::init(Parameters &parameters) throw (ecl::StandardException)
 {
 
   if (!parameters.validate())
   {
-    throw ecl::StandardException(LOC, ecl::ConfigurationError, "Kobuki's parameter settings did not validate.");
+    throw ecl::StandardException(LOC, ecl::ConfigurationError, "Kmr's parameter settings did not validate.");
   }
   this->parameters = parameters;
   std::string sigslots_namespace = parameters.sigslots_namespace;
@@ -136,7 +136,7 @@ void Kobuki::init(Parameters &parameters) throw (ecl::StandardException)
   sendCommand(Command::GetControllerGain());
   //sig_controller_info.emit(); //emit default gain
 
-  thread.start(&Kobuki::spin, *this);
+  thread.start(&Kmr::spin, *this);
 }
 
 /*****************************************************************************
@@ -153,7 +153,7 @@ void Kobuki::init(Parameters &parameters) throw (ecl::StandardException)
  * If instead you just want to poll kmr, then you should lock and unlock
  * the data access around any getXXX calls.
  */
-void Kobuki::lockDataAccess() {
+void Kmr::lockDataAccess() {
   data_mutex.lock();
 }
 
@@ -161,7 +161,7 @@ void Kobuki::lockDataAccess() {
  * Unlock a previously locked data access privilege.
  * @sa lockDataAccess()
  */
-void Kobuki::unlockDataAccess() {
+void Kmr::unlockDataAccess() {
   data_mutex.unlock();
 }
 
@@ -174,7 +174,7 @@ void Kobuki::unlockDataAccess() {
  * Or, if in simulation, just loopsback the motor devices.
  */
 
-void Kobuki::spin()
+void Kmr::spin()
 {
   ecl::TimeStamp last_signal_time;
   ecl::Duration timeout(0.1);
@@ -377,7 +377,7 @@ void Kobuki::spin()
   sig_error.emit("Driver worker thread shutdown!");
 }
 
-void Kobuki::fixPayload(ecl::PushAndPop<unsigned char> & byteStream)
+void Kmr::fixPayload(ecl::PushAndPop<unsigned char> & byteStream)
 {
   if (byteStream.size() < 3 ) { /* minimum size of sub-payload is 3; header_id, length, data */
     sig_named.emit(log("error", "packet", "too small sub-payload detected."));
@@ -416,7 +416,7 @@ void Kobuki::fixPayload(ecl::PushAndPop<unsigned char> & byteStream)
  ** Implementation [Human Friendly Accessors]
  *****************************************************************************/
 
-ecl::Angle<double> Kobuki::getHeading() const
+ecl::Angle<double> Kmr::getHeading() const
 {
   ecl::Angle<double> heading;
   // raw data angles are in hundredths of a degree, convert to radians.
@@ -424,7 +424,7 @@ ecl::Angle<double> Kobuki::getHeading() const
   return ecl::wrap_angle(heading - heading_offset);
 }
 
-double Kobuki::getAngularVelocity() const
+double Kmr::getAngularVelocity() const
 {
   // raw data angles are in hundredths of a degree, convert to radians.
   return (static_cast<double>(inertia.data.angle_rate) / 100.0) * ecl::pi / 180.0;
@@ -434,7 +434,7 @@ double Kobuki::getAngularVelocity() const
  ** Implementation [Raw Data Accessors]
  *****************************************************************************/
 
-void Kobuki::resetOdometry()
+void Kmr::resetOdometry()
 {
   diff_drive.reset();
 
@@ -442,7 +442,7 @@ void Kobuki::resetOdometry()
   heading_offset = (static_cast<double>(inertia.data.angle) / 100.0) * ecl::pi / 180.0;
 }
 
-void Kobuki::getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle_rate, double &wheel_right_angle,
+void Kmr::getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle_rate, double &wheel_right_angle,
                                  double &wheel_right_angle_rate)
 {
   diff_drive.getWheelJointStates(wheel_left_angle, wheel_left_angle_rate, wheel_right_angle, wheel_right_angle_rate);
@@ -459,7 +459,7 @@ void Kobuki::getWheelJointStates(double &wheel_left_angle, double &wheel_left_an
  * @param pose_update : return the pose updates in this variable.
  * @param pose_update_rates : return the pose update rates in this variable.
  */
-void Kobuki::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_algebra::Vector3d &pose_update_rates)
+void Kmr::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_algebra::Vector3d &pose_update_rates)
 {
   diff_drive.update(core_sensors.data.time_stamp, core_sensors.data.left_encoder, core_sensors.data.right_encoder,
                       pose_update, pose_update_rates);
@@ -469,30 +469,30 @@ void Kobuki::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_
  ** Commands
  *****************************************************************************/
 
-void Kobuki::setLed(const enum LedNumber &number, const enum LedColour &colour)
+void Kmr::setLed(const enum LedNumber &number, const enum LedColour &colour)
 {
   sendCommand(Command::SetLedArray(number, colour, kmr_command.data));
 }
 
-void Kobuki::setDigitalOutput(const DigitalOutput &digital_output) {
+void Kmr::setDigitalOutput(const DigitalOutput &digital_output) {
   sendCommand(Command::SetDigitalOutput(digital_output, kmr_command.data));
 }
 
-void Kobuki::setExternalPower(const DigitalOutput &digital_output) {
+void Kmr::setExternalPower(const DigitalOutput &digital_output) {
   sendCommand(Command::SetExternalPower(digital_output, kmr_command.data));
 }
 
-//void Kobuki::playSound(const enum Sounds &number)
+//void Kmr::playSound(const enum Sounds &number)
 //{
 //  sendCommand(Command::PlaySound(number, kmr_command.data));
 //}
 
-void Kobuki::playSoundSequence(const enum SoundSequences &number)
+void Kmr::playSoundSequence(const enum SoundSequences &number)
 {
   sendCommand(Command::PlaySoundSequence(number, kmr_command.data));
 }
 
-bool Kobuki::setControllerGain(const unsigned char &type, const unsigned int &p_gain,
+bool Kmr::setControllerGain(const unsigned char &type, const unsigned int &p_gain,
                                const unsigned int &i_gain, const unsigned int &d_gain)
 {
   if ((firmware.flashed_major_version() < 2) && (firmware.flashed_minor_version() < 2)) {
@@ -507,7 +507,7 @@ bool Kobuki::setControllerGain(const unsigned char &type, const unsigned int &p_
   return true;
 }
 
-bool Kobuki::getControllerGain()
+bool Kmr::getControllerGain()
 {
   if ((firmware.flashed_major_version() < 2) && (firmware.flashed_minor_version() < 2)) {
     sig_warn.emit("Robot firmware doesn't support this function, so you must upgrade it. " \
@@ -521,12 +521,12 @@ bool Kobuki::getControllerGain()
   return true;
 }
 
-void Kobuki::setBaseControl(const double &linear_velocity, const double &angular_velocity)
+void Kmr::setBaseControl(const double &linear_velocity, const double &angular_velocity)
 {
   diff_drive.setVelocityCommands(linear_velocity, angular_velocity);
 }
 
-void Kobuki::sendBaseControlCommand()
+void Kmr::sendBaseControlCommand()
 {
   std::vector<double> velocity_commands_received;
   if( acceleration_limiter.isEnabled() ) {
@@ -556,7 +556,7 @@ void Kobuki::sendBaseControlCommand()
  *
  * @param command : prepared command template (see Command's static member functions).
  */
-void Kobuki::sendCommand(Command command)
+void Kmr::sendCommand(Command command)
 {
   if( !is_alive || !is_connected ) {
     //need to do something
@@ -586,13 +586,13 @@ void Kobuki::sendCommand(Command command)
   command_mutex.unlock();
 }
 
-bool Kobuki::enable()
+bool Kmr::enable()
 {
   is_enabled = true;
   return true;
 }
 
-bool Kobuki::disable()
+bool Kmr::disable()
 {
   setBaseControl(0.0f, 0.0f);
   sendBaseControlCommand();
@@ -608,7 +608,7 @@ bool Kobuki::disable()
  * connections are dangling (often happens when you typo
  * the name of the sigslots connection).
  */
-void Kobuki::printSigSlotConnections() const {
+void Kmr::printSigSlotConnections() const {
 
   std::cout << "========== Void ==========" << std::endl;
   ecl::SigSlotsManager<>::printStatistics();

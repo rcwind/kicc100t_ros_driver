@@ -26,11 +26,11 @@ Here is full source code of simple control loop example. You can find it from sr
 ** Classes
 *****************************************************************************/
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() :
+  KmrManager() :
     dx(0.0), dth(0.0),
-    slot_stream_data(&KobukiManager::processStreamData, *this)
+    slot_stream_data(&KmrManager::processStreamData, *this)
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/kmr";
@@ -41,7 +41,7 @@ public:
     slot_stream_data.connect("/kmr/stream_data");
   }
 
-  ~KobukiManager() {
+  ~KmrManager() {
     kmr.setBaseControl(0,0); // linear_velocity, angular_velocity in (m/s), (rad/s)
     kmr.disable();
   }
@@ -70,7 +70,7 @@ public:
 private:
   double dx, dth;
   ecl::LegacyPose2D<double> pose;
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 };
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   signal(SIGINT, signalHandler);
 
   std::cout << "Demo : Example of simple control loop." << std::endl;
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
 
   ecl::Sleep sleep(1);
   ecl::LegacyPose2D<double> pose;
@@ -130,15 +130,15 @@ ecl/geometry/pose2d.hpp and ecl/linear_algebra.hpp is used to store and calculat
 
 @subsection class Class
 
-The KobukiManager class contains kmr::Kobuki class, pose data and sigslot callback.
-KobukiManager class is extended from previous @ref enSigslotsGuide "sigslots" examples. Now it has dx, dth and pose data.
+The KmrManager class contains kmr::Kmr class, pose data and sigslot callback.
+KmrManager class is extended from previous @ref enSigslotsGuide "sigslots" examples. Now it has dx, dth and pose data.
 
 @code
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() :
+  KmrManager() :
     dx(0.0), dth(0.0),
-    slot_stream_data(&KobukiManager::processStreamData, *this)
+    slot_stream_data(&KmrManager::processStreamData, *this)
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/kmr";
@@ -150,10 +150,10 @@ public:
   }
 @endcode
 
-Only @ref kmr::Kobuki::enable() "kmr.enable()" is added from previous sigslot exmaple. It will turn on motor power of kmr. To moving kmr, you should call this function before commanding wheel velocities.
+Only @ref kmr::Kmr::enable() "kmr.enable()" is added from previous sigslot exmaple. It will turn on motor power of kmr. To moving kmr, you should call this function before commanding wheel velocities.
 
 @code
-  ~KobukiManager() {
+  ~KmrManager() {
     kmr.setBaseControl(0,0); // linear_velocity, angular_velocity in (m/s), (rad/s)
     kmr.disable();
   }
@@ -161,9 +161,9 @@ Only @ref kmr::Kobuki::enable() "kmr.enable()" is added from previous sigslot ex
 
 Destructor is added in this example. When quiting the porgam, this code will immediately stop the robot and disable it. It will improve the controllability in emergent condition, and will prevent unwanted behavior.
 
-@ref kmr::Kobuki::setBaseControl() "kmr.setBaseControl()" is a function to send wheel command to robot. It's arguments are linear and angular velocities in (m/s) and (rad/s).
+@ref kmr::Kmr::setBaseControl() "kmr.setBaseControl()" is a function to send wheel command to robot. It's arguments are linear and angular velocities in (m/s) and (rad/s).
 
-@ref kmr::Kobuki::disable() "disable()" will turned off the motor power.
+@ref kmr::Kmr::disable() "disable()" will turned off the motor power.
 
 @code
   void processStreamData() {
@@ -179,7 +179,7 @@ Destructor is added in this example. When quiting the porgam, this code will imm
 
 processStreamData() is slot callback function, when stream data is arrived from robot, this callback will be called.
 
-@ kmr::Kobuki::updateOdometry() method is used to retriving odometry data from last stream data.
+@ kmr::Kmr::updateOdometry() method is used to retriving odometry data from last stream data.
 It returns `updated_pose` and `updated_pose_rate` that calculated from encoder ticks.
 
 pose_update containts calculated linear and angular displacements between the stream.
@@ -219,7 +219,7 @@ getPose() is simple getter method for accumulated pose of robot.
 private:
   double dx, dth;
   ecl::LegacyPose2D<double> pose;
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 };
 @endcode
@@ -234,7 +234,7 @@ void signalHandler(int signum) {
 @endcode
 
 This part is signal handler. signalHandler() will be called when the SIGINT signal is catched(e.g. user pressed the ctrl+c keys). A bool variable, shutdown_req, setted to false will break the while loop in main function, and terminates program also.
-If there is no signal handler, program will terminated without calling destructor of KobukiManager class. And the robot will run last wheel command continuously until timed out(5 seconds by default).
+If there is no signal handler, program will terminated without calling destructor of KmrManager class. And the robot will run last wheel command continuously until timed out(5 seconds by default).
 
 @subsection main Main
 
@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 
 @code
   std::cout << "Demo : Example of simple control loop." << std::endl;
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
 
   ecl::Sleep sleep(1);
   ecl::LegacyPose2D<double> pose;

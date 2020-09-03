@@ -39,7 +39,7 @@ It does not establish any slots.
 The <i>/kmr/stream_data</i> is the most important slot. The kmr sends a single long data packet
 periodically and when this is received, it emits a signal informing you that it has arrived and is
 ready to be processed. At this point, you can quiz the kmr driver for the state (
-@ref kmr::Kobuki::getCoreSensorData) which returns a @ref kmr::CoreSensors::Data structure
+@ref kmr::Kmr::getCoreSensorData) which returns a @ref kmr::CoreSensors::Data structure
 holding all the important sensor information for kmr.
 
 @subsection simpleExample Simple Example - Catching Wheel Odometry
@@ -53,10 +53,10 @@ to standard output:
 #include <iostream>
 #include <kmr_driver/kmr.hpp>
 
-class KobukiManager {
+class KmrManager {
 public:
-  KobukiManager() :
-      slot_stream_data(&KobukiManager::processStreamData, *this) // establish the callback
+  KmrManager() :
+      slot_stream_data(&KmrManager::processStreamData, *this) // establish the callback
   {
     kmr::Parameters parameters;
     parameters.sigslots_namespace = "/kmr"; // configure the first part of the sigslot namespace
@@ -85,12 +85,12 @@ public:
   }
 
 private:
-  kmr::Kobuki kmr;
+  kmr::Kmr kmr;
   ecl::Slot<> slot_stream_data;
 };
 
 int main() {
-  KobukiManager kmr_manager;
+  KmrManager kmr_manager;
   kmr_manager.spin();
   return 0;
 }
@@ -115,7 +115,7 @@ use to quickly print the currently sigslot connections (dangling or otherwise).
 A code snippet:
 
 @code
-  Kobuki kmr
+  Kmr kmr
   Parameters parameters;
   // configure parameters here
   kmr.init(parameters);

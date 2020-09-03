@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Kobuki Firmware</title>
+    <title>Kmr Firmware</title>
   </head>
   <body>
   <?php
@@ -11,7 +11,7 @@
     $sdk_bundles = glob($directory . "*.zip");
  
     //print each file name
-    echo("<h1>Windows Drivers for Kobuki</h1>");
+    echo("<h1>Windows Drivers for Kmr</h1>");
     echo("<p>The following archives are sdk bundles for the kmr driver. They include ");
     echo("headers and libraries for kmr and all of its dependencies. Refer to the ");
     echo("<a href='http://kmr.yujinrobot.com/documentation/howtos/upgrading-firmware/'>howto</a> ");

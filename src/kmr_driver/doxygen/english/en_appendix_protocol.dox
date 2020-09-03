@@ -10,7 +10,7 @@
 
 @section enOverview Overview
 
-The @ref kmr::Kobuki "kmr driver" communicates with the robot by using predefined protocol. In general, the driver sends the commands to the robot and the robot sends some feedback data or sensor readings. These commands and feedback data are converted into bytestreams for communication via serial interface. The protocol specifies that rules and forms of bytestreams.
+The @ref kmr::Kmr "kmr driver" communicates with the robot by using predefined protocol. In general, the driver sends the commands to the robot and the robot sends some feedback data or sensor readings. These commands and feedback data are converted into bytestreams for communication via serial interface. The protocol specifies that rules and forms of bytestreams.
 
 
 <!-----------------------------
@@ -335,7 +335,7 @@ Request PID gain of wheel velocity controller of robot.
 
 @subsection enFeedbackIdentifier Feedback Identifier
 
-Kobuki sends below default feedbacks periodically in 50 Hz, when it powered on.
+Kmr sends below default feedbacks periodically in 50 Hz, when it powered on.
 
 <table>
 <tr><th>ID</th><th>Name</th><th>Description</th><th>Availability</th></tr>
@@ -390,7 +390,7 @@ Basic core sensor data. <!--Robot will sends this data periodically from power o
 
 @note
 This sub-payload will be sent by default.
-@sa @ref enAppendixKobukiParameters - necessary parameters for conversion of encoder ticks to robot pose.
+@sa @ref enAppendixKmrParameters - necessary parameters for conversion of encoder ticks to robot pose.
 
 <br>
 
@@ -412,7 +412,7 @@ Signals from the docking station.
 <tr height="40"><td>Left signal</td><td align="center">1</td><td align="center"></td><td></td></tr>
 </table>
 
-Kobuki's docking station has 3 <a href="http://en.wikipedia.org/wiki/Infrared">IR</a> emitters. The emitted IR lights cover three regions in front of the docking station: left, central and right, each divided in two sub-fields: near and far. Each beam encodes this information, so the robot knows at any moment in which region and sub-field he is. Also, as regions and fields are independently identified, they can be overlap on its borders.
+Kmr's docking station has 3 <a href="http://en.wikipedia.org/wiki/Infrared">IR</a> emitters. The emitted IR lights cover three regions in front of the docking station: left, central and right, each divided in two sub-fields: near and far. Each beam encodes this information, so the robot knows at any moment in which region and sub-field he is. Also, as regions and fields are independently identified, they can be overlap on its borders.
 @image html dock_ir_fields.png "Docking IR Fields"
 
 <br>

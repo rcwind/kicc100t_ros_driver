@@ -8,7 +8,7 @@ This section describes the installation process for Linux.
 
 @subsection who Target audience
 
-Linux people who want to compile Kobuki driver, but not use ros
+Linux people who want to compile Kmr driver, but not use ros
 
 
 @section Procedure 
@@ -53,7 +53,7 @@ cmake variables (again, CMAKE_INSTALL_PREFIX is a useful one, otherwise it defau
 @subsection test Testing your installation
 
 You can test your installation by executing some of the demo and test
-programs provided with Kobuki driver. You must point your <i>LD_LIBRARY_PATH</i> variable to
+programs provided with Kmr driver. You must point your <i>LD_LIBRARY_PATH</i> variable to
 the installed libraries. For example, if you type the following commands, the robot should move making squares:
 
 @code
@@ -67,7 +67,7 @@ We still have not prepared proper cross-compiling documentation, but have done s
 
 @section support Additional support
 
-Do not hesitate to ask on <a href="mailto:kmr-users@yujinrobot.com">Kobuki users list</a> if you need additional
+Do not hesitate to ask on <a href="mailto:kmr-users@yujinrobot.com">Kmr users list</a> if you need additional
 support.
 
 **/
