@@ -461,7 +461,7 @@ void Kmr::getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle
  */
 void Kmr::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_algebra::Vector3d &pose_update_rates)
 {
-  diff_drive.update(core_sensors.data.time_stamp, core_sensors.data.left_encoder, core_sensors.data.right_encoder,
+  diff_drive.update(core_sensors.data.time_stamp, core_sensors.data.left_encoder, core_sensors.data.right_encoder, core_sensors.data.steering,
                       pose_update, pose_update_rates);
 }
 

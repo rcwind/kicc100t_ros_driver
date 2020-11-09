@@ -50,6 +50,7 @@ public:
     uint8_t charger;
     uint8_t battery;
     uint8_t over_current;
+    int32_t steering;
   } data;
 
   struct Flags {

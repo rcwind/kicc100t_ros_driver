@@ -40,6 +40,7 @@ bool CoreSensors::serialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildBytes(data.charger, byteStream);		//1
   buildBytes(data.battery, byteStream);		//1
   buildBytes(data.over_current, byteStream);	//1
+  buildBytes(data.steering, byteStream);	//2
 
   return true;
 }
@@ -69,6 +70,7 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(data.charger, byteStream);
   buildVariable(data.battery, byteStream);
   buildVariable(data.over_current, byteStream);
+  buildVariable(data.steering, byteStream);
 
   return true;
 }

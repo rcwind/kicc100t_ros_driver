@@ -38,6 +38,7 @@ DiffDrive::DiffDrive() :
   wheel_radius(0.085), // radius of main wheel, in [m]
   //tick_to_rad(0.00317332585858586),
   tick_to_rad(0.004197185),
+  heading(0.0),
   diff_drive_kinematics(bias, wheel_radius)
 {
   (void) imu_heading_offset;
@@ -57,6 +58,7 @@ DiffDrive::DiffDrive() :
 void DiffDrive::update(const uint16_t &time_stamp,
                        const uint16_t &left_encoder,
                        const uint16_t &right_encoder,
+                       const int32_t &steering,
                        ecl::LegacyPose2D<double> &pose_update,
                        ecl::linear_algebra::Vector3d &pose_update_rates) {
   state_mutex.lock();
@@ -67,6 +69,12 @@ void DiffDrive::update(const uint16_t &time_stamp,
   unsigned short curr_tick_left = 0;
   unsigned short curr_tick_right = 0;
   unsigned short curr_timestamp = 0;
+  double steering_pos;
+  double d_pos;
+  double d_dist;
+  double d_theta;
+  double d_x;
+  double d_y;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
   if (!init_l)
@@ -89,7 +97,42 @@ void DiffDrive::update(const uint16_t &time_stamp,
   last_rad_right += tick_to_rad * right_diff_ticks;
 
   // TODO this line and the last statements are really ugly; refactor, put in another place
-  pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
+  // pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
+  d_pos = (tick_to_rad * left_diff_ticks + tick_to_rad * right_diff_ticks) / 2;
+  d_dist = d_pos * wheel_radius;// 弧长公式
+  d_theta = tan(steering / 100.0) * d_dist / bias;
+  // d_x = sin(d_theta) * d_dist;
+  // d_y = cos(d_theta) * d_dist;
+  // pose_update.x(d_x * cos(last_theta) - d_y * sin(last_theta));
+  // pose_update.y(d_y * sin(last_theta) + d_y * cos(last_theta));
+  // pose_update.heading(d_theta);
+
+  // https://github.com/ros-controls/ros_controllers/blob/noetic-devel/ackermann_steering_controller/src/odometry.cpp
+  if (fabs(angular) < 1e-6)
+  {
+      const double direction = heading + angular * 0.5;
+
+      /// Runge-Kutta 2nd order integration:
+      d_x = d_dist  * cos(direction);
+      d_y = d_theta * sin(direction);
+      heading += d_theta;
+  }
+  else
+  {
+      /// Exact integration (should solve problems when angular is zero):
+      const double heading_old = heading;
+      const double r = d_dist/d_theta;
+      heading += d_theta;
+      d_x =  r * (sin(heading) - sin(heading_old));
+      d_y = -r * (cos(heading) - cos(heading_old));
+  }
+
+  // https://github.com/stonier/ecl_core/blob/release/1.1.x/ecl_mobile_robot/src/lib/differential_drive.cpp
+  // pose_update.translation(d_dist, 0);
+  // pose_update.rotation(d_theta);
+  pose_update.x(d_x);// 这里不想更改函数传递的参数，直接赋值方式，node里更新pose不能用乘法
+  pose_update.y(d_y);
+  pose_update.heading(d_theta);
 
   if (curr_timestamp != last_timestamp)
   {
@@ -101,8 +144,9 @@ void DiffDrive::update(const uint16_t &time_stamp,
     // we need to set the last_velocity_xxx to zero?
   }
 
-  pose_update_rates << pose_update.x()/last_diff_time,
-                       pose_update.y()/last_diff_time,
+  pose_update_rates << d_dist/last_diff_time,
+                       0,
+                       // pose_update.y()/last_diff_time,
                        pose_update.heading()/last_diff_time;
   state_mutex.unlock();
 }
@@ -139,31 +183,15 @@ void DiffDrive::velocityCommands(const double &vx, const double &wz) {
   // vx: in m/s
   // wz: in rad/s
   velocity_mutex.lock();
-  const double epsilon = 0.0001;
 
-  // Special Case #1 : Straight Run
-  if( std::abs(wz) < epsilon ) {
-    radius = 0.0f;
-    speed  = 1000.0f * vx;
-    velocity_mutex.unlock();
-    return;
-  }
+  if ((wz == 0) && (vx != 0))
+      radius = 0;
+  else if ((wz == 0) && (vx == 0))
+      radius = 1;// 停车，steering不动
+  else
+      radius = vx / wz;
+  speed = vx;
 
-  radius = vx * 1000.0f / wz;
-  // Special Case #2 : Pure Rotation or Radius is less than or equal to 1.0 mm
-  if( std::abs(vx) < epsilon || std::abs(radius) <= 1.0f ) {
-    speed  = 1000.0f * bias * wz / 2.0f;
-    radius = 1.0f;
-    velocity_mutex.unlock();
-    return;
-  }
-
-  // General Case :
-  if( radius > 0.0f ) {
-    speed  = (radius + 1000.0f * bias / 2.0f) * wz;
-  } else {
-    speed  = (radius - 1000.0f * bias / 2.0f) * wz;
-  }
   velocity_mutex.unlock();
   return;
 }

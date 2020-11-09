@@ -42,6 +42,7 @@ public:
   void update(const uint16_t &time_stamp,
               const uint16_t &left_encoder,
               const uint16_t &right_encoder,
+              const int32_t &steering,
               ecl::LegacyPose2D<double> &pose_update,
               ecl::linear_algebra::Vector3d &pose_update_rates);
   void reset();
@@ -78,6 +79,7 @@ private:
   double speed;  // in [mm/s]
   double bias; //wheelbase, wheel_to_wheel, in [m]
   double wheel_radius; // in [m]
+  double heading;
   int imu_heading_offset;
   const double tick_to_rad;
 
