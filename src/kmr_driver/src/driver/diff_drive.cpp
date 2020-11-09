@@ -110,7 +110,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   // https://github.com/ros-controls/ros_controllers/blob/noetic-devel/ackermann_steering_controller/src/odometry.cpp
   if (fabs(d_theta) < 1e-6)
   {
-      const double direction = heading + angular * 0.5;
+      const double direction = heading + d_theta * 0.5;
 
       /// Runge-Kutta 2nd order integration:
       d_x = d_dist  * cos(direction);
