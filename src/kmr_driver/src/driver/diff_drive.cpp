@@ -101,12 +101,13 @@ void DiffDrive::update(const uint16_t &time_stamp,
   d_pos = (tick_to_rad * left_diff_ticks + tick_to_rad * right_diff_ticks) / 2;
   d_dist = d_pos * wheel_radius;// 弧长公式
   d_theta = tan(steering / 100.0) * d_dist / bias;
-  // d_x = sin(d_theta) * d_dist;
-  // d_y = cos(d_theta) * d_dist;
-  // pose_update.x(d_x * cos(last_theta) - d_y * sin(last_theta));
-  // pose_update.y(d_y * sin(last_theta) + d_y * cos(last_theta));
-  // pose_update.heading(d_theta);
-
+#if 0
+  d_x = sin(d_theta) * d_dist;
+  d_y = cos(d_theta) * d_dist;
+  d_x = d_x * cos(heading) - d_y * sin(heading);
+  d_y = d_y * sin(heading) + d_y * cos(heading);
+  heading += d_theta;
+#else
   // https://github.com/ros-controls/ros_controllers/blob/noetic-devel/ackermann_steering_controller/src/odometry.cpp
   if (fabs(d_theta) < 1e-6)
   {
@@ -126,11 +127,12 @@ void DiffDrive::update(const uint16_t &time_stamp,
       d_x =  r * (sin(heading) - sin(heading_old));
       d_y = -r * (cos(heading) - cos(heading_old));
   }
+#endif
 
   // https://github.com/stonier/ecl_core/blob/release/1.1.x/ecl_mobile_robot/src/lib/differential_drive.cpp
   // pose_update.translation(d_dist, 0);
   // pose_update.rotation(d_theta);
-  pose_update.x(d_x);// 这里不想更改函数传递的参数，直接赋值方式，node里更新pose不能用乘法
+  pose_update.x(d_x);// 这里不想更改函数传递的参数，直接赋值方式，node里更新pose不能用乘法，乘法适用于差速车
   pose_update.y(d_y);
   pose_update.heading(d_theta);
 
