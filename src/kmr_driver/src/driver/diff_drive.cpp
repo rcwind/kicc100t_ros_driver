@@ -108,7 +108,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   // pose_update.heading(d_theta);
 
   // https://github.com/ros-controls/ros_controllers/blob/noetic-devel/ackermann_steering_controller/src/odometry.cpp
-  if (fabs(angular) < 1e-6)
+  if (fabs(d_theta) < 1e-6)
   {
       const double direction = heading + angular * 0.5;
 
