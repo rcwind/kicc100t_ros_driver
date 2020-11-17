@@ -33,11 +33,11 @@ DiffDrive::DiffDrive() :
   point_velocity(2,0.0), // command velocities, in [m/s] and [rad/s]
   radius(0.0), // command velocities, in [mm] and [mm/s]
   speed(0.0),
-  bias(0.161), // wheelbase, wheel_to_wheel, in [m]
+  bias(0.811), // wheelbase, wheel_to_wheel, in [m]
   //bias(0.223), // wheelbase, wheel_to_wheel, in [m]
-  wheel_radius(0.085), // radius of main wheel, in [m]
+  wheel_radius(0.15), // radius of main wheel, in [m]
   //tick_to_rad(0.00317332585858586),
-  tick_to_rad(0.004197185),
+  tick_to_rad(0.001533981),
   heading(0.0),
   diff_drive_kinematics(bias, wheel_radius)
 {
@@ -191,8 +191,9 @@ void DiffDrive::velocityCommands(const double &vx, const double &wz) {
   else if ((wz == 0) && (vx == 0))
       radius = 1;// 停车，steering不动
   else
-      radius = vx / wz;
-  speed = vx;
+      radius = vx * 1000.0f / wz;
+
+  speed = vx * 1000.0f;
 
   velocity_mutex.unlock();
   return;
