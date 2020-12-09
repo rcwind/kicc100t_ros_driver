@@ -40,12 +40,14 @@ public:
   struct Data {
     uint16_t time_stamp;
     uint8_t bumper;
-    uint8_t wheel_drop;
-    uint8_t cliff;
+    // uint8_t wheel_drop;
+    // uint8_t cliff;
+    uint16_t left_steering;
     uint16_t left_encoder;
     uint16_t right_encoder;
-    char left_pwm;
-    char right_pwm;
+    uint16_t right_steering;
+    // char left_pwm;
+    // char right_pwm;
     uint8_t buttons;
     uint8_t charger;
     uint8_t battery;
