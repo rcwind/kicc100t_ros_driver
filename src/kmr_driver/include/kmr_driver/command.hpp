@@ -117,7 +117,7 @@ public:
   static Command PlaySoundSequence(const enum SoundSequences &number, Command::Data &current_data);
   static Command GetVersionInfo();
   static Command SetVelocityControl(DiffDrive& diff_drive);
-  static Command SetVelocityControl(const int16_t &speed, const int16_t &radius);
+  static Command SetVelocityControl(const int16_t &speed, const int16_t &radius, const int16_t &angle);
   static Command SetControllerGain(const unsigned char &type,
                                    const unsigned int &p_gain,
                                    const unsigned int &i_gain,

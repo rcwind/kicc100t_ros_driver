@@ -47,7 +47,7 @@ public:
   void reset();
   void getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle_rate,
                            double &wheel_right_angle, double &wheel_right_angle_rate);
-  void setVelocityCommands(const double &vx, const double &wz);
+  void setVelocityCommands(const double &vx, const double &wz, const double &yaw);
   void velocityCommands(const double &vx, const double &wz, const double &yaw);
   void velocityCommands(const short &cmd_speed, const short &cmd_radius, const short &cmd_angle);
   void velocityCommands(const std::vector<double> &cmd) { velocityCommands(cmd[0], cmd[1], cmd[2]); }

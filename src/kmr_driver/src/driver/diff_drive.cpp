@@ -141,7 +141,7 @@ void DiffDrive::velocityCommands(const double &vx, const double &wz, const doubl
   // wz: in rad/s
   velocity_mutex.lock();
   const double epsilon = 0.0001;
-  angle = RAD2DEG(yaw) * 100;
+  angle = yaw / M_PI * 180 * 100;// 0.01degree
 
   // Special Case #1 : Straight Run
   if( std::abs(wz) < epsilon ) {
@@ -181,7 +181,7 @@ void DiffDrive::velocityCommands(const short &cmd_speed, const short &cmd_radius
 
 std::vector<short> DiffDrive::velocityCommands() {
   velocity_mutex.lock();
-  std::vector<short> cmd(2);
+  std::vector<short> cmd(3);
   cmd[0] = bound(speed);  // In [mm/s]
   cmd[1] = bound(radius); // In [mm]
   cmd[2] = bound(angle); // In [0.01degree]
