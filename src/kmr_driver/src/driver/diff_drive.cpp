@@ -30,7 +30,7 @@ DiffDrive::DiffDrive() :
   last_rad_left(0.0),
   last_rad_right(0.0),
 //  v(0.0), w(0.0), // command velocities, in [m/s] and [rad/s]
-  point_velocity(2, 0.0, 0.0), // command velocities, in [m/s] and [rad/s] and [rad]
+  point_velocity(3, 0.0), // command velocities, in [m/s] and [rad/s] and [rad]
   radius(0.0), // command velocities, in [mm] and [mm/s]
   speed(0.0),
   bias(0.161), //横向距离 wheelbase, wheel_to_wheel, in [m]
