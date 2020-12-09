@@ -521,9 +521,9 @@ bool Kmr::getControllerGain()
   return true;
 }
 
-void Kmr::setBaseControl(const double &linear_velocity, const double &angular_velocity)
+void Kmr::setBaseControl(const double &linear_velocity, const double &angular_velocity, const double &yaw)
 {
-  diff_drive.setVelocityCommands(linear_velocity, angular_velocity);
+  diff_drive.setVelocityCommands(linear_velocity, angular_velocity, yaw);
 }
 
 void Kmr::sendBaseControlCommand()
@@ -537,7 +537,7 @@ void Kmr::sendBaseControlCommand()
   diff_drive.velocityCommands(velocity_commands_received);
   std::vector<short> velocity_commands = diff_drive.velocityCommands();
   // std::cout << "speed: " << velocity_commands[0] << ", radius: " << velocity_commands[1] << std::endl;
-  sendCommand(Command::SetVelocityControl(velocity_commands[0], velocity_commands[1]));
+  sendCommand(Command::SetVelocityControl(velocity_commands[0], velocity_commands[1], velocity_commands[2]));
 
   //experimental; send raw control command and received command velocity
   velocity_commands_debug=velocity_commands;
@@ -594,7 +594,7 @@ bool Kmr::enable()
 
 bool Kmr::disable()
 {
-  setBaseControl(0.0f, 0.0f);
+  setBaseControl(0.0f, 0.0f, 0.0f);
   sendBaseControlCommand();
   is_enabled = false;
   return true;

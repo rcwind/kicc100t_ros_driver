@@ -160,15 +160,17 @@ Command Command::SetVelocityControl(DiffDrive& diff_drive)
   std::vector<short> velocity_commands = diff_drive.velocityCommands();
   outgoing.data.speed = velocity_commands[0];
   outgoing.data.radius = velocity_commands[1];
+  outgoing.data.angle = velocity_commands[2];
   outgoing.data.command = Command::BaseControl;
   return outgoing;
 }
 
-Command Command::SetVelocityControl(const int16_t &speed, const int16_t &radius)
+Command Command::SetVelocityControl(const int16_t &speed, const int16_t &radius, const int16_t &angle)
 {
   Command outgoing;
   outgoing.data.speed = speed;
   outgoing.data.radius = radius;
+  outgoing.data.angle = angle;
   outgoing.data.command = Command::BaseControl;
   return outgoing;
 }
@@ -216,9 +218,10 @@ bool Command::serialise(ecl::PushAndPop<unsigned char> & byteStream)
   {
     case BaseControl:
       buildBytes(cmd, byteStream);
-      buildBytes(length=4, byteStream);
+      buildBytes(length=6, byteStream);
       buildBytes(data.speed, byteStream);
       buildBytes(data.radius, byteStream);
+      buildBytes(data.angle, byteStream);
       break;
     case Sound:
       buildBytes(cmd, byteStream);

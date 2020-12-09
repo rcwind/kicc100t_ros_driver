@@ -30,11 +30,11 @@ DiffDrive::DiffDrive() :
   last_rad_left(0.0),
   last_rad_right(0.0),
 //  v(0.0), w(0.0), // command velocities, in [m/s] and [rad/s]
-  point_velocity(2,0.0), // command velocities, in [m/s] and [rad/s]
+  point_velocity(2, 0.0, 0.0), // command velocities, in [m/s] and [rad/s] and [rad]
   radius(0.0), // command velocities, in [mm] and [mm/s]
   speed(0.0),
-  bias(0.161), // wheelbase, wheel_to_wheel, in [m]
-  //bias(0.223), // wheelbase, wheel_to_wheel, in [m]
+  bias(0.161), //横向距离 wheelbase, wheel_to_wheel, in [m]
+  lng(0.223), // 纵向距离 wheelbase, wheel_to_wheel, in [m]
   wheel_radius(0.085), // radius of main wheel, in [m]
   //tick_to_rad(0.00317332585858586),
   tick_to_rad(0.004197185),
@@ -89,7 +89,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   last_rad_right += tick_to_rad * right_diff_ticks;
 
   // TODO this line and the last statements are really ugly; refactor, put in another place
-  pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
+  // pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
 
   if (curr_timestamp != last_timestamp)
   {
@@ -126,20 +126,22 @@ void DiffDrive::getWheelJointStates(double &wheel_left_angle, double &wheel_left
   state_mutex.unlock();
 }
 
-void DiffDrive::setVelocityCommands(const double &vx, const double &wz) {
+void DiffDrive::setVelocityCommands(const double &vx, const double &wz, const double &yaw) {
   // vx: in m/s
   // wz: in rad/s
   std::vector<double> cmd_vel;
   cmd_vel.push_back(vx);
   cmd_vel.push_back(wz);
+  cmd_vel.push_back(yaw);
   point_velocity = cmd_vel;
 }
 
-void DiffDrive::velocityCommands(const double &vx, const double &wz) {
+void DiffDrive::velocityCommands(const double &vx, const double &wz, const double &yaw) {
   // vx: in m/s
   // wz: in rad/s
   velocity_mutex.lock();
   const double epsilon = 0.0001;
+  angle = RAD2DEG(yaw) * 100;
 
   // Special Case #1 : Straight Run
   if( std::abs(wz) < epsilon ) {
@@ -152,26 +154,27 @@ void DiffDrive::velocityCommands(const double &vx, const double &wz) {
   radius = vx * 1000.0f / wz;
   // Special Case #2 : Pure Rotation or Radius is less than or equal to 1.0 mm
   if( std::abs(vx) < epsilon || std::abs(radius) <= 1.0f ) {
-    speed  = 1000.0f * bias * wz / 2.0f;
+    speed  = 1000.0f * std::sqrt(std::pow(bias / 2, 2) + std::pow(lng / 2, 2)) * wz;
     radius = 1.0f;
     velocity_mutex.unlock();
     return;
   }
 
   // General Case :
-  if( radius > 0.0f ) {
-    speed  = (radius + 1000.0f * bias / 2.0f) * wz;
-  } else {
-    speed  = (radius - 1000.0f * bias / 2.0f) * wz;
-  }
+  // if( radius > 0.0f ) {
+  speed  = 1000.0f * vx;//(radius + 1000.0f * bias / 2.0f) * wz;
+  // } else {
+    // speed  = (radius - 1000.0f * bias / 2.0f) * wz;
+  // }
   velocity_mutex.unlock();
   return;
 }
 
-void DiffDrive::velocityCommands(const short &cmd_speed, const short &cmd_radius) {
+void DiffDrive::velocityCommands(const short &cmd_speed, const short &cmd_radius,  const short &cmd_angle) {
   velocity_mutex.lock();
   speed = static_cast<double>(cmd_speed);   // In [mm/s]
   radius = static_cast<double>(cmd_radius); // In [mm]
+  angle = static_cast<double>(cmd_angle); // In [0.01degree]
   velocity_mutex.unlock();
   return;
 }
@@ -181,6 +184,7 @@ std::vector<short> DiffDrive::velocityCommands() {
   std::vector<short> cmd(2);
   cmd[0] = bound(speed);  // In [mm/s]
   cmd[1] = bound(radius); // In [mm]
+  cmd[2] = bound(angle); // In [0.01degree]
   velocity_mutex.unlock();
   return cmd;
 }
