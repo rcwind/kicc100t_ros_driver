@@ -114,8 +114,8 @@ public:
   EventManager() {
     last_state.buttons    = 0;
     last_state.bumper     = 0;
-    last_state.cliff      = 0;
-    last_state.wheel_drop = 0;
+    // last_state.cliff      = 0;
+    // last_state.wheel_drop = 0;
     last_state.charger    = 0;
     last_state.battery    = 0;
     last_digital_input    = 0;

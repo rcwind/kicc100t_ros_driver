@@ -124,6 +124,7 @@ void EventManager::update(const CoreSensors::Data &new_state, const std::vector<
     }
   }
 
+#if 0
   // ------------
   // Cliff Event
   // ------------
@@ -197,6 +198,7 @@ void EventManager::update(const CoreSensors::Data &new_state, const std::vector<
     }
   }
 
+#endif
   // ------------
   // Power System Event
   // ------------
