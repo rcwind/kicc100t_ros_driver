@@ -57,6 +57,10 @@ DiffDrive::DiffDrive() :
 void DiffDrive::update(const uint16_t &time_stamp,
                        const uint16_t &left_encoder,
                        const uint16_t &right_encoder,
+                       const int16_t &left_steering,
+                       const int16_t &right_steering,
+                       const double &heading,
+                       const double &delta_heading,
                        ecl::LegacyPose2D<double> &pose_update,
                        ecl::linear_algebra::Vector3d &pose_update_rates) {
   state_mutex.lock();
@@ -67,13 +71,18 @@ void DiffDrive::update(const uint16_t &time_stamp,
   unsigned short curr_tick_left = 0;
   unsigned short curr_tick_right = 0;
   unsigned short curr_timestamp = 0;
+  double left_delta_s, right_delta_s;
+  double left_delta_x, right_delta_x;
+  double left_delta_y, right_delta_y;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
+
   if (!init_l)
   {
     last_tick_left = curr_tick_left;
     init_l = true;
   }
+
   left_diff_ticks = (double)(short)((curr_tick_left - last_tick_left) & 0xffff);
   last_tick_left = curr_tick_left;
   last_rad_left += tick_to_rad * left_diff_ticks;
@@ -88,6 +97,18 @@ void DiffDrive::update(const uint16_t &time_stamp,
   last_tick_right = curr_tick_right;
   last_rad_right += tick_to_rad * right_diff_ticks;
 
+  left_delta_s  = wheel_radius * (tick_to_rad * left_diff_ticks);
+  right_delta_s = wheel_radius * (tick_to_rad * right_diff_ticks);
+
+  left_delta_x = left_delta_s * cos(heading + delta_heading);
+  left_delta_y = left_delta_s * sin(heading + delta_heading);
+
+  right_delta_x = right_delta_s * cos(heading + delta_heading);
+  right_delta_y = right_delta_s * sin(heading + delta_heading);
+
+  pose_update.x((left_delta_x + right_delta_x) / 2.0);
+  pose_update.y((left_delta_y + right_delta_y) / 2.0);
+  pose_update.heading(delta_heading);
   // TODO this line and the last statements are really ugly; refactor, put in another place
   // pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
 

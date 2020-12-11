@@ -185,6 +185,8 @@ private:
   ** Inertia
   **********************/
   double heading_offset;
+  double delta_heading;
+  double pre_heading;
 
   /*********************
   ** Driver Paramters

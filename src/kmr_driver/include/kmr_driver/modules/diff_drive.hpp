@@ -42,6 +42,10 @@ public:
   void update(const uint16_t &time_stamp,
               const uint16_t &left_encoder,
               const uint16_t &right_encoder,
+              const int16_t &left_steering,
+              const int16_t &right_steering,
+              const double &heading,
+              const double &delta_heading,
               ecl::LegacyPose2D<double> &pose_update,
               ecl::linear_algebra::Vector3d &pose_update_rates);
   void reset();

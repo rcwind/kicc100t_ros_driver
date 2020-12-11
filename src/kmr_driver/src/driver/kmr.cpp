@@ -51,7 +51,9 @@ bool PacketFinder::checkSum()
 Kmr::Kmr() :
     shutdown_requested(false)
     , is_enabled(false)
-    , heading_offset(0.0/0.0)
+    , heading_offset(0.0)
+    , delta_heading(0.0)
+    , pre_heading(0.0)
     , is_connected(false)
     , is_alive(false)
     , version_info_reminder(0)
@@ -461,8 +463,18 @@ void Kmr::getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle
  */
 void Kmr::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_algebra::Vector3d &pose_update_rates)
 {
-  diff_drive.update(core_sensors.data.time_stamp, core_sensors.data.left_encoder, core_sensors.data.right_encoder,
-                      pose_update, pose_update_rates);
+    ecl::Angle<double> heading = getHheading();
+    delta_heading = heading - pre_heading;
+
+    delta_heading = heading;
+    diff_drive.update(core_sensors.data.time_stamp, 
+            core_sensors.data.left_encoder, core_sensors.data.right_encoder, 
+            core_sensors.data.left_steering, core_sensors.data.right_steering,
+            getHeading(),
+            delta_heading,
+            pose_update, pose_update_rates);
+
+    pre_heading = heading;
 }
 
 /*****************************************************************************
