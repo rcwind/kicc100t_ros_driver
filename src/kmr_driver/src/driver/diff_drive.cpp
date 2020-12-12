@@ -74,6 +74,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   double left_delta_s, right_delta_s;
   double left_delta_x, right_delta_x;
   double left_delta_y, right_delta_y;
+  double left_steering_rad, right_steering_rad;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
 
@@ -100,14 +101,14 @@ void DiffDrive::update(const uint16_t &time_stamp,
   left_delta_s  = wheel_radius * (tick_to_rad * left_diff_ticks);
   right_delta_s = wheel_radius * (tick_to_rad * right_diff_ticks);
 
-  left_steering   = left_steering / 100.0 / 180.0 * M_PI;
-  right_steering  = right_steering / 100.0 / 180.0 * M_PI;
+  left_steering_rad   = left_steering / 100.0 / 180.0 * M_PI;
+  right_steering_rad  = right_steering / 100.0 / 180.0 * M_PI;
 
-  left_delta_x = left_delta_s * cos(left_steering + heading + delta_heading);
-  left_delta_y = left_delta_s * sin(left_steering + heading + delta_heading);
+  left_delta_x = left_delta_s * cos(left_steering_rad + heading + delta_heading);
+  left_delta_y = left_delta_s * sin(left_steering_rad + heading + delta_heading);
 
-  right_delta_x = right_delta_s * cos(right_steering + heading + delta_heading);
-  right_delta_y = right_delta_s * sin(right_steering + heading + delta_heading);
+  right_delta_x = right_delta_s * cos(right_steering_rad + heading + delta_heading);
+  right_delta_y = right_delta_s * sin(right_steering_rad + heading + delta_heading);
 
   pose_update.x((left_delta_x + right_delta_x) / 2.0);
   pose_update.y((left_delta_y + right_delta_y) / 2.0);
