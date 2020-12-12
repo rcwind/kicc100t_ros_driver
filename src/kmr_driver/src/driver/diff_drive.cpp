@@ -100,6 +100,9 @@ void DiffDrive::update(const uint16_t &time_stamp,
   left_delta_s  = wheel_radius * (tick_to_rad * left_diff_ticks);
   right_delta_s = wheel_radius * (tick_to_rad * right_diff_ticks);
 
+  left_steering   = left_steering / 100.0 / 180.0 * M_PI;
+  right_steering  = right_steering / 100.0 / 180.0 * M_PI;
+
   left_delta_x = left_delta_s * cos(left_steering + heading + delta_heading);
   left_delta_y = left_delta_s * sin(left_steering + heading + delta_heading);
 
