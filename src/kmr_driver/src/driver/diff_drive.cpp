@@ -75,6 +75,8 @@ void DiffDrive::update(const uint16_t &time_stamp,
   double left_delta_x, right_delta_x;
   double left_delta_y, right_delta_y;
   double left_steering_rad, right_steering_rad;
+  double left_rad, right_rad;
+  double delta_x, delta_y;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
 
@@ -104,14 +106,25 @@ void DiffDrive::update(const uint16_t &time_stamp,
   left_steering_rad   = left_steering / 100.0 / 180.0 * M_PI;
   right_steering_rad  = right_steering / 100.0 / 180.0 * M_PI;
 
-  left_delta_x = left_delta_s * cos(left_steering_rad + heading + delta_heading);
-  left_delta_y = left_delta_s * sin(left_steering_rad + heading + delta_heading);
+  left_rad = left_steering_rad + heading + delta_heading;
+  right_rad = right_steering_rad + heading + delta_heading;
 
-  right_delta_x = right_delta_s * cos(right_steering_rad + heading + delta_heading);
-  right_delta_y = right_delta_s * sin(right_steering_rad + heading + delta_heading);
+  printf("l:%f %f=%f+%f+%f\n", left_delta_s, left_rad, left_steering_rad, heading, delta_heading);
+  printf("r:%f %f=%f+%f+%f\n", right_delta_s, right_rad, right_steering_rad, heading, delta_heading);
 
-  pose_update.x((left_delta_x + right_delta_x) / 2.0);
-  pose_update.y((left_delta_y + right_delta_y) / 2.0);
+  left_delta_x = left_delta_s * cos(left_rad);
+  left_delta_y = left_delta_s * sin(left_rad);
+
+  right_delta_x = right_delta_s * cos(right_rad);
+  right_delta_y = right_delta_s * sin(right_rad);
+
+  delta_x = (left_delta_x + right_delta_x) / 2.0;
+  delta_y = (left_delta_y + right_delta_y) / 2.0;
+
+  printf("dx:%f=%f+%f, dy:%f=%f+%f\n", delta_x, left_delta_x, right_delta_x, delta_y, left_delta_y, right_delta_y);
+
+  pose_update.x(delta_x);
+  pose_update.y(delta_y);
   pose_update.heading(delta_heading);
   // TODO this line and the last statements are really ugly; refactor, put in another place
   // pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
