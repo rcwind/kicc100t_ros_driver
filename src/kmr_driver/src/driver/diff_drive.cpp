@@ -13,12 +13,35 @@
 
 #include "../../include/kmr_driver/modules/diff_drive.hpp"
 
+#include <fcntl.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
 namespace kmr {
 
+char print_buf[1024];
+char file_name[128];
+int file_fd;
+char *gen_file_name(void)
+{
+	time_t timep;
+	struct tm *p;
+	time(&timep);
+	p=localtime(&timep); 
+	sprintf(file_name, "40AH-test-%d-%02d-%02d_%02d-%02d-%02d.csv", 
+			(1900+p->tm_year),
+			1+p->tm_mon, 
+			p->tm_mday,
+			p->tm_hour, 
+			p->tm_min, 
+			p->tm_sec);
+
+	return file_name;
+}
 /*****************************************************************************
 ** Implementation
 *****************************************************************************/
@@ -41,6 +64,7 @@ DiffDrive::DiffDrive() :
   diff_drive_kinematics(bias, wheel_radius)
 {
   (void) imu_heading_offset;
+  file_fd = open(gen_file_name(), O_RDWR|O_CREAT, S_IWUSR|S_IRUSR|S_IROTH);
 }
 
 /**
@@ -79,6 +103,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   double delta_x, delta_y;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
+  int len, total_len;
 
   if (!init_l)
   {
@@ -109,8 +134,14 @@ void DiffDrive::update(const uint16_t &time_stamp,
   left_rad = left_steering_rad + heading + delta_heading;
   right_rad = right_steering_rad + heading + delta_heading;
 
-  printf("l:%f %f=%f+%f+%f\n", left_delta_s, left_rad, left_steering_rad, heading, delta_heading);
-  printf("r:%f %f=%f+%f+%f\n", right_delta_s, right_rad, right_steering_rad, heading, delta_heading);
+  total_len = 0;
+
+  len = sprintf(&print_buf[total_len], "speed:%f radius:%f: heading:%fdeg\n", speed, radius, heading / M_PI * 180);
+  total_len += len;
+  len = sprintf(&print_buf[total_len], "l:%f %f=%f+%f+%f\n", left_delta_s, left_rad, left_steering_rad, heading, delta_heading);
+  total_len += len;
+  len = sprintf(&print_buf[total_len], "r:%f %f=%f+%f+%f\n", right_delta_s, right_rad, right_steering_rad, heading, delta_heading);
+  total_len += len;
 
   left_delta_x = left_delta_s * cos(left_rad);
   left_delta_y = left_delta_s * sin(left_rad);
@@ -121,7 +152,9 @@ void DiffDrive::update(const uint16_t &time_stamp,
   delta_x = (left_delta_x + right_delta_x) / 2.0;
   delta_y = (left_delta_y + right_delta_y) / 2.0;
 
-  printf("dx:%f=%f+%f, dy:%f=%f+%f\n", delta_x, left_delta_x, right_delta_x, delta_y, left_delta_y, right_delta_y);
+  printf("dx:%f=%f+%f, dy:%f=%f+%f\n\n", delta_x, left_delta_x, right_delta_x, delta_y, left_delta_y, right_delta_y);
+  total_len += len;
+  write(file_fd, print_buf, total_len);
 
   pose_update.x(delta_x);
   pose_update.y(delta_y);
