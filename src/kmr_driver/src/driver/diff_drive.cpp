@@ -101,6 +101,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   double left_steering_rad, right_steering_rad;
   double left_rad, right_rad;
   double delta_x, delta_y;
+  static double x = 0, y = 0;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
   int len, total_len;
@@ -138,9 +139,9 @@ void DiffDrive::update(const uint16_t &time_stamp,
 
   len = sprintf(&print_buf[total_len], "speed:%f radius:%f: heading:%fdeg\n", speed, radius, heading / M_PI * 180);
   total_len += len;
-  len = sprintf(&print_buf[total_len], "l:%f %f=%f+%f+%f\n", left_delta_s, left_rad, left_steering_rad, heading, delta_heading);
+  len = sprintf(&print_buf[total_len], "l:ds:%f rad:%f=ste:%f+yaw:%f+dh:%f\n", left_delta_s, left_rad, left_steering_rad, heading, delta_heading);
   total_len += len;
-  len = sprintf(&print_buf[total_len], "r:%f %f=%f+%f+%f\n", right_delta_s, right_rad, right_steering_rad, heading, delta_heading);
+  len = sprintf(&print_buf[total_len], "r:ds:%f rad:%f=ste:%f+yaw:%f+dh:%f\n", right_delta_s, right_rad, right_steering_rad, heading, delta_heading);
   total_len += len;
 
   left_delta_x = left_delta_s * cos(left_rad);
@@ -152,8 +153,15 @@ void DiffDrive::update(const uint16_t &time_stamp,
   delta_x = (left_delta_x + right_delta_x) / 2.0;
   delta_y = (left_delta_y + right_delta_y) / 2.0;
 
-  printf("dx:%f=%f+%f, dy:%f=%f+%f\n\n", delta_x, left_delta_x, right_delta_x, delta_y, left_delta_y, right_delta_y);
+  len = sprintf(&print_buf[total_len], "dx:%f=lx:%f+rx:%f, dy:%f=ly:%f+ry:%f\n", delta_x, left_delta_x, right_delta_x, delta_y, left_delta_y, right_delta_y);
   total_len += len;
+
+  x += delta_x;
+  y += delta_y;
+
+  len = sprintf(&print_buf[total_len], "x:%f y:%f\n\n", x, y);
+  total_len += len;
+
   write(file_fd, print_buf, total_len);
 
   pose_update.x(delta_x);
