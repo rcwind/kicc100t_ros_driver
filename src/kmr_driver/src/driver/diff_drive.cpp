@@ -32,7 +32,7 @@ char *gen_file_name(void)
 	struct tm *p;
 	time(&timep);
 	p=localtime(&timep); 
-	sprintf(file_name, "40AH-test-%d-%02d-%02d_%02d-%02d-%02d.csv", 
+	sprintf(file_name, "40AH-test-%d-%02d-%02d_%02d-%02d-%02d.txt", 
 			(1900+p->tm_year),
 			1+p->tm_mon, 
 			p->tm_mday,
