@@ -466,7 +466,6 @@ void Kmr::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_alg
     ecl::Angle<double> heading = getHeading();
     delta_heading = heading - pre_heading;
 
-    delta_heading = heading;
     diff_drive.update(core_sensors.data.time_stamp, 
             core_sensors.data.left_encoder, core_sensors.data.right_encoder, 
             core_sensors.data.left_steering, core_sensors.data.right_steering,
