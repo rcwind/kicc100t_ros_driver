@@ -464,12 +464,12 @@ void Kmr::getWheelJointStates(double &wheel_left_angle, double &wheel_left_angle
 void Kmr::updateOdometry(ecl::LegacyPose2D<double> &pose_update, ecl::linear_algebra::Vector3d &pose_update_rates)
 {
     ecl::Angle<double> heading = getHeading();
-    delta_heading = heading - pre_heading;
+    delta_heading = ecl::wrap_angle(heading - pre_heading);
 
     diff_drive.update(core_sensors.data.time_stamp, 
             core_sensors.data.left_encoder, core_sensors.data.right_encoder, 
             core_sensors.data.left_steering, core_sensors.data.right_steering,
-            getHeading(),
+            heading,
             delta_heading,
             pose_update, pose_update_rates);
 
