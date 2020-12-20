@@ -173,6 +173,16 @@ Command Command::SetVelocityControl(const int16_t &speed, const int16_t &radius)
   return outgoing;
 }
 
+Command Command::SetDock(const unsigned char &dock)
+{
+  Command outgoing;
+  outgoing.data.type = dock;
+  outgoing.data.p_gain = 0;
+  outgoing.data.i_gain = 0;
+  outgoing.data.d_gain = 0;
+  outgoing.data.command = Command::SetController;
+  return outgoing;
+}
 Command Command::SetControllerGain(const unsigned char &type, const unsigned int &p_gain,
                                    const unsigned int &i_gain, const unsigned int &d_gain)
 {

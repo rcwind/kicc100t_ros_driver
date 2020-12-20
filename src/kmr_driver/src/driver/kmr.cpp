@@ -478,6 +478,7 @@ void Kmr::setDigitalOutput(const DigitalOutput &digital_output) {
   sendCommand(Command::SetDigitalOutput(digital_output, kmr_command.data));
 }
 
+
 void Kmr::setExternalPower(const DigitalOutput &digital_output) {
   sendCommand(Command::SetExternalPower(digital_output, kmr_command.data));
 }
@@ -492,6 +493,9 @@ void Kmr::playSoundSequence(const enum SoundSequences &number)
   sendCommand(Command::PlaySoundSequence(number, kmr_command.data));
 }
 
+void Kmr::setDock(const unsigned char &dock) {
+  sendCommand(Command::SetDock(dock));
+}
 bool Kmr::setControllerGain(const unsigned char &type, const unsigned int &p_gain,
                                const unsigned int &i_gain, const unsigned int &d_gain)
 {
