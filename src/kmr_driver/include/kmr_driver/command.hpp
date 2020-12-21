@@ -121,7 +121,7 @@ public:
                                    const unsigned int &p_gain,
                                    const unsigned int &i_gain,
                                    const unsigned int &d_gain);
-  Static Command SetDock(const unsigned char &dock);
+  static Command SetDock(const unsigned char &dock);
   static Command GetControllerGain();
 
   Data data;
