@@ -122,6 +122,7 @@ public:
                                    const unsigned int &i_gain,
                                    const unsigned int &d_gain);
   static Command SetDock(const unsigned char &dock);
+  static Command SetMagTracker(const unsigned char &action);
   static Command GetControllerGain();
 
   Data data;

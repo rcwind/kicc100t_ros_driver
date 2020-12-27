@@ -131,7 +131,13 @@ Command Command::SetExternalPower(const DigitalOutput &digital_output, Command::
   outgoing.data.command = Command::SetDigitalOut;
   return outgoing;
 }
-
+Command Command::SetMagTracker(const unsigned char &action)
+{
+  Command outgoing;
+  outgoing.data.segment_name = action;
+  outgoing.data.command = Command::SoundSequence;
+  return outgoing;
+}
 Command Command::PlaySoundSequence(const enum SoundSequences &number, Command::Data & /* current_data */)
 {
   uint16_t value; // gp_out is 16 bits
