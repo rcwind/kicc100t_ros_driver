@@ -154,6 +154,7 @@ public:
   /*********************
   ** Hard Commands
   **********************/
+  void setMagTracker(const unsigned char &action);
   void setDock(const unsigned char &dock);
   void setBaseControl(const double &linear_velocity, const double &angular_velocity);
   void setLed(const enum LedNumber &number, const enum LedColour &colour);

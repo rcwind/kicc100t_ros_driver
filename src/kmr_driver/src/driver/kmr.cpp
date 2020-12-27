@@ -483,10 +483,10 @@ void Kmr::setExternalPower(const DigitalOutput &digital_output) {
   sendCommand(Command::SetExternalPower(digital_output, kmr_command.data));
 }
 
-//void Kmr::playSound(const enum Sounds &number)
-//{
-//  sendCommand(Command::PlaySound(number, kmr_command.data));
-//}
+void Kmr::setMagTracker(const unsigned char &action)
+{
+  sendCommand(Command::SetMagTracker(action));
+}
 
 void Kmr::playSoundSequence(const enum SoundSequences &number)
 {
