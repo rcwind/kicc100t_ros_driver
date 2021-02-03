@@ -75,7 +75,10 @@ void DiffDrive::update(const uint16_t &time_stamp,
   double d_theta;
   double d_x;
   double d_y;
+
   curr_timestamp = time_stamp;
+
+  // left
   curr_tick_left = left_encoder;
   if (!init_l)
   {
@@ -86,6 +89,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   last_tick_left = curr_tick_left;
   last_rad_left += tick_to_rad * left_diff_ticks;
 
+  // right
   curr_tick_right = right_encoder;
   if (!init_r)
   {
@@ -100,7 +104,7 @@ void DiffDrive::update(const uint16_t &time_stamp,
   // pose_update = diff_drive_kinematics.forward(tick_to_rad * left_diff_ticks, tick_to_rad * right_diff_ticks);
   d_pos = (tick_to_rad * left_diff_ticks + tick_to_rad * right_diff_ticks) / 2;
   d_dist = d_pos * wheel_radius;// 弧长公式
-  d_theta = tan(steering / 100.0) * d_dist / bias;
+  d_theta = tan(steering / 100.0 / 180.0 * 3.1415926) * d_dist / bias;
 #if 0
   d_x = sin(d_theta) * d_dist;
   d_y = cos(d_theta) * d_dist;
