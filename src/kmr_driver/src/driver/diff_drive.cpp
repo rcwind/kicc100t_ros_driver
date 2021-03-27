@@ -190,12 +190,17 @@ void DiffDrive::velocityCommands(const double &vx, const double &wz) {
   // wz: in rad/s
   velocity_mutex.lock();
 
-  if ((wz == 0) && (vx != 0))
-      radius = 0;
-  else if ((wz == 0) && (vx == 0))
-      radius = 1;// 停车，steering不动
-  else
-      radius = vx * 1000.0f / wz;
+  const double epsilon = 0.0001;
+
+  // Special Case #1 : Straight Run
+  if( std::abs(wz) < epsilon ) {
+      radius = 0.0f;
+      speed  = 1000.0f * vx;
+      velocity_mutex.unlock();
+      return;
+  }
+
+  radius = vx * 1000.0f / wz;
 
   speed = vx * 1000.0f;
 
