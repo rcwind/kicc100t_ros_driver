@@ -33,9 +33,9 @@ DiffDrive::DiffDrive() :
   point_velocity(2,0.0), // command velocities, in [m/s] and [rad/s]
   radius(0.0), // command velocities, in [mm] and [mm/s]
   speed(0.0),
-  bias(0.811), // wheelbase, wheel_to_wheel, in [m]
+  bias(1.925), // wheelbase, wheel_to_wheel, in [m]
   //bias(0.223), // wheelbase, wheel_to_wheel, in [m]
-  wheel_radius(0.15), // radius of main wheel, in [m]
+  wheel_radius(0.27), // radius of main wheel, in [m]
   //tick_to_rad(0.00317332585858586),
   tick_to_rad(0.001533981),
   heading(0.0),
