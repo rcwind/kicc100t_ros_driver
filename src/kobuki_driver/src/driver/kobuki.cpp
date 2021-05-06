@@ -492,6 +492,9 @@ void Kobuki::playSoundSequence(const enum SoundSequences &number)
   sendCommand(Command::PlaySoundSequence(number, kobuki_command.data));
 }
 
+void Kobuki::setDock(const unsigned char &dock) {
+  sendCommand(Command::SetDock(dock));
+}
 bool Kobuki::setControllerGain(const unsigned char &type, const unsigned int &p_gain,
                                const unsigned int &i_gain, const unsigned int &d_gain)
 {
